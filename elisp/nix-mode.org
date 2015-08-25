@@ -28,7 +28,8 @@ Version: 1.0
 and inspired by the following source:
 Author: Russel Winder <russel@winder.org.uk>, 2006–
 	Jim Morris <morris@wolfman.com>, 2009–
-  Maintainer:  Russel Winder <russel@winder.org.uk>
+URL: https://github.com/Groovy-Emacs-Modes/groovy-emacs-modes/blob/master/groovy-mode.el
+Maintainer:  Russel Winder <russel@winder.org.uk>
 
 Right now I didn't cherry pick all the features, but quite works quite well.
 
