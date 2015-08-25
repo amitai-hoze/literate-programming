@@ -1,0 +1,5 @@
+* Public elisp literate programming
+:PROPERTIES:
+:ID:       231a4eb4-ed6d-472d-962f-1f2a27852b50
+:END:
+

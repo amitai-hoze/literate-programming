@@ -1,0 +1,92 @@
+#+PROPERTY: header-args :shebang "#!/bin/sh"
+
+* Shell script files
+:PROPERTIES:
+:ID:       6946c996-68f9-4f97-a63d-4df158bbf6f3
+:END:
+** Image processing
+*** Calculate bits per pixel
+#+begin_src sh
+#! /bin/sh
+
+echo Quality: `identify -verbose $1 | grep Quality | cut -f2 -d:`
+export pixels=`identify -verbose $1 | grep "Pixels:" | cut -f2 -d:`
+echo Pixels = $pixels
+export bits=`ls -all $1 | cut -f5 -d" "`
+echo bits = $bits
+
+export bpp=`echo "$bits / $pixels" | bc -l`
+
+echo Bits per pixel = $bpp
+#+end_src
+** Text
+*** Compare if files have the same lines
+#+begin_src sh
+#!/bin/sh
+
+sort $1 | sed '/^$/d' | sed -e 's/^[ \t]*//' > $1.1.ig
+sort $2 | sed '/^$/d' | sed -e 's/^[ \t]*//' > $2.2.ig
+
+meld $1.1.ig $2.2.ig
+rm $1.1.ig
+rm $2.2.ig
+#+end_src
+** Ubuntu
+*** Copy the ubuntu background slideshow
+#+begin_src sh
+#! /bin/bash
+
+mkdir ubuntu_backgrounds
+i=0
+for file in `cat $1 | grep "file" | cut -f2 -d">" | cut -f1 -d"<"`; do
+    echo $file
+    i=$((i+1))
+    cp $file ubuntu_backgrounds/$i.jpg
+done
+#+end_src
+** Git
+*** Clean
+:PROPERTIES:
+:ID:       18affada-9ccf-4d24-a23d-ad67d8c475f9
+:END:
+#+begin_src sh :tangle git-clean.sh
+#!/bin/sh
+
+git fsck
+git prune
+git reflog expire --expire=now --all
+git repack -ad  # Remove dangling objects from packfiles
+git prune       # Remove dangling loose objects
+#+end_src
+*** git-diff
+:PROPERTIES:
+:ID:       670bce1c-88a7-4659-ae12-efaca5cdad90
+:END:
+#+begin_src sh :tangle git-diff.sh
+#!/bin/sh
+
+meld "$2" "$5" > /dev/null 2>&1
+#+end_src
+*** Show history
+:PROPERTIES:
+:ID:       a9acb004-0312-40fb-bcfe-6f1658238345
+:END:
+#+begin_src sh :tangle git-show-history.sh
+#! /bin/sh
+
+for commit in `git log --oneline | cut -f1 -d" "`; do
+    echo -n $commit:
+    git show $commit:./$1
+
+done
+#+end_src
+*** Update my fork on github
+:PROPERTIES:
+:ID:       8b76af3c-db4d-40cb-acb8-370a7027aec3
+:END:
+#+begin_src sh :tangle git-update-fork.sh
+git fetch upstream
+git checkout master
+git merge upstream/master
+echo "You can now push.."
+#+end_src

@@ -4,11 +4,15 @@
 #+TITLE:NixOS configuration file
 #+AUTHOR:Amitai Hoze
 
-* NixOS
+* NixOS configuration file
+:PROPERTIES:
+:ID:       75ac1874-d700-4e66-9058-fa8753cf3e7c
+:END:
+** NixOS
 :PROPERTIES:
 :ID:       29b02e0a-9aa8-4d5d-8d5a-43ac7b5c1735
 :END:
-#+begin_src nix :noweb yes :tangle ~/org-mode/nixos/configuration.nix
+#+begin_src nix :noweb yes :tangle configuration.nix
 { pkgs, config, ... }: {
     nixpkgs.config.allowUnfree = true;
     nixpkgs.config.allowBroken = true;
@@ -93,8 +97,8 @@
 }
 #+end_src
 
-* Nix package manager
-** Toshiba packages
+** Nix package manager
+*** Toshiba packages
 :PROPERTIES:
 :ID:       9a2670f6-2e9e-48c5-bed4-8be229414af0
 :END:
@@ -105,7 +109,7 @@ with import <nixpkgs> {}; [
     <<source-control>>
 ]
 #+end_src
-** Mini-Mac packages
+*** Mini-Mac packages
 :PROPERTIES:
 :ID:       15682c74-afc4-45cb-9f3f-0cb2bf3d70c7
 :END:
@@ -116,14 +120,14 @@ with import <nixpkgs> {}; [
     emacs
 ]
 #+end_src
-* Packages
-** Libraries
+** Packages
+*** Libraries
 
 #+name: libraries
 #+begin_src nix
 kde4.kdelibs
 #+end_src
-** Games
+*** Games
 :PROPERTIES:
 :ID:       0305e0e0-298e-41cf-913a-88184364cd4b
 :END:
@@ -137,7 +141,7 @@ kde4.ktuberling
 # asc
 # bullet
 #+end_src
-** Command line tools
+*** Command line tools
 :PROPERTIES:
 :ID:       6d4cb55a-9ca1-48bb-bfa1-a3205ca18f74
 :END:
@@ -150,7 +154,7 @@ unzip
 binutils
 unoconv
 #+end_src
-** Nix tools
+*** Nix tools
 :PROPERTIES:
 :ID:       e27cd13d-be27-430e-a245-d8e9309dd329
 :END:
@@ -161,7 +165,7 @@ nox
 nix-prefetch-scripts
 nix-repl
 #+end_src
-** Misc
+*** Misc
 :PROPERTIES:
 :ID:       384d7586-b0f5-4a5e-93d4-5924db7d8e92
 :END:
@@ -176,8 +180,8 @@ kde4.kmymoney
 #kde4.k3b
 #linuxPackages.virtualbox
 #+end_src
-** Media
-*** Players and Viewers
+*** Media
+**** Players and Viewers
 :PROPERTIES:
 :ID:       1f0e2380-ebfa-4e18-ae4b-4c3fbe5651c2
 :END:
@@ -188,7 +192,7 @@ vlc
 kde4.gwenview
 evince
 #+end_src
-*** Editors
+**** Editors
 :PROPERTIES:
 :ID:       30913cba-cd57-4fba-a2c2-cbd56bf40413
 :END:
@@ -207,7 +211,7 @@ imagemagick
 #libreoffice
 #dia
 #+end_src
-** Latex
+*** Latex
 :PROPERTIES:
 :ID:       d41b3e36-9c2f-48ef-9b73-b9de3e4a4625
 :END:
@@ -216,8 +220,8 @@ imagemagick
 #+begin_src nix
 (texLiveAggregationFun { paths = [ texLive texLiveExtra texLiveBeamer ]; })
 #+end_src
-** Development
-*** Interperters
+*** Development
+**** Interperters
 :PROPERTIES:
 :ID:       faedc95b-2217-4ed3-b57f-2883be76039b
 :END:
@@ -228,7 +232,7 @@ python
 expect
 tcl
 #+end_src
-*** Haskell
+**** Haskell
 :PROPERTIES:
 :ID:       740595ff-da44-41c5-88fb-728d45e5405f
 :END:
@@ -251,7 +255,7 @@ tcl
     yi
   ] ))
 #+end_src
-*** Java
+**** Java
 :PROPERTIES:
 :ID:       799576a9-527e-44d7-8e4f-e25446a4c414
 :END:
@@ -260,7 +264,7 @@ tcl
 #+begin_src nix
 #oraclejdk8
 #+end_src
-*** Editors and IDEs
+**** Editors and IDEs
 :PROPERTIES:
 :ID:       5419fb15-5f0c-42d7-a54b-59df0ccf5883
 :END:
@@ -270,7 +274,7 @@ tcl
 emacs
 idea.android-studio
 #+end_src
-*** Source Control
+**** Source Control
 :PROPERTIES:
 :ID:       8bef2816-a5ef-4cd1-bed2-bd27c4b419f3
 :END:
@@ -280,7 +284,7 @@ idea.android-studio
 git
 meld
 #+end_src
-** Internet
+*** Internet
 :PROPERTIES:
 :ID:       e81a02c1-0762-4e1b-8067-7ca718344885
 :END:
@@ -293,7 +297,7 @@ aria
 youtube-dl
 telegram-cli
 #+end_src
-** Math
+*** Math
 :PROPERTIES:
 :ID:       7858ac8d-1d4d-4f39-ae7d-4bb2d66d0b04
 :END:
@@ -303,7 +307,7 @@ telegram-cli
 octave
 maxima
 #+end_src
-** System Tools
+*** System Tools
 :PROPERTIES:
 :ID:       0dfede89-a46e-4a91-bf36-b4da96838561
 :END:
@@ -315,15 +319,15 @@ kde4.filelight
 unetbootin
 gparted
 #+end_src
-** Ruby Gems
+*** Ruby Gems
 <<current-stage>>
 #+name: ruby-gems
 #+begin_src nix
 ruby
-#bundix
+bundix
 #taskjuggler
 #+end_src
-* Hardware 
+** Hardware 
 :PROPERTIES:
 :ID:       ffe178bc-3002-4027-99f7-0c2fb4145164
 :END:
@@ -340,7 +344,7 @@ bumblebee = {
     group = "video";
 };
 #+end_src
-* Boot
+** Boot
 :PROPERTIES:
 :ID:       42d050f5-cf82-48e0-bf93-ba85ea73c62a
 :END:
@@ -369,7 +373,7 @@ loader.grub = {
     memtest86.enable = false;
 };
 #+end_src
-* File Systems
+** File Systems
 :PROPERTIES:
 :ID:       7090625a-05d9-46ae-9ee4-e5f12596bbe8
 :END:
@@ -392,7 +396,7 @@ loader.grub = {
     fsType = "ntfs";
 };
 #+end_src
-* Services
+** Services
 :PROPERTIES:
 :ID:       e0899a47-aab2-46c7-b4a8-56827a4c9bc1
 :END:
@@ -419,7 +423,7 @@ xserver = {
     desktopManager.kde4.enable = true;
 };
 #+end_src
-* Users
+** Users
 :PROPERTIES:
 :ID:       b1c59348-47f5-42e5-abc3-d8bf1119fe6a
 :END:
@@ -432,7 +436,7 @@ description = "Amitai Hoze";
 extraGroups = [ "wheel" "networkmanager" ];
 shell = "/run/current-system/sw/bin/zsh";
 #+end_src
-* Shell Aliases
+** Shell Aliases
 :PROPERTIES:
 :ID:       f92cf89b-b0eb-476d-b0b1-baf7cb06e51e
 :END:
@@ -472,7 +476,7 @@ ydamp3 = "youtube-dl -x --audio-format mp3";
 ydp = "youtube-dl -i";
 bundix_here = "bundix --gemfile Gemfile --lockfile Gemfile.lock --target gemset.nix --lock";
 #+end_src
-* Shell init
+** Shell init
 :PROPERTIES:
 :ID:       05ee2d6d-c724-410f-b4b0-4eddba20306d
 :END:
@@ -486,7 +490,7 @@ export doconSource=/home/amitai/src/docon/docon/source
 #export JAVA_HOME=dollar{pkgs.oraclejdk8.home}
 #export JAVA_HOME=dollar{pkgs.jdk.home}
 #+end_src
-* Fonts
+** Fonts
 :PROPERTIES:
 :ID:       738d5a2e-4d36-48a6-8a58-633a018ade65
 :END:
