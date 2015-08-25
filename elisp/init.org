@@ -1,0 +1,1297 @@
+#+LATEX_HEADER: \usepackage{parskip}
+#+LATEX_HEADER: \usepackage{inconsolata}
+#+PROPERTY: header-args :tangle ~/.emacs.d/init.el :comments org
+
+#+TITLE:Emacs configuration file
+#+AUTHOR:Amitai Hoze
+
+* General
+** Custom load path
+:PROPERTIES:
+:ID:       ef70512c-f090-4121-a161-090dcdf96fcb
+:END:
+#+begin_src emacs-lisp
+;; Adding per file elisp settings
+(add-to-list 'load-path "~/org-mode/elisp")
+#+end_src
+* NixOS
+:PROPERTIES:
+:ID:       87a9d8b7-202b-46d0-b160-142e8efa2030
+:END:
+#+begin_src emacs-lisp
+(require 'tramp) 
+(add-to-list 'tramp-remote-path "/run/current-system/sw/bin")
+#+end_src
+* Debugging
+:PROPERTIES:
+:ID:       82f210d5-3d25-4b71-bc5b-c22050c66393
+:END:
+#+begin_src emacs-lisp
+(defun debug-function (function)
+  (interactive (find-function-read))
+  (let ((buffer (current-buffer)))
+    (find-function function)
+    (edebug-defun)
+    (switch-to-buffer buffer)))
+#+end_src
+Set a key
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-h C-d") 'debug-function)
+#+end_src
+* Package
+** Melpa
+:PROPERTIES:
+:ID:       db698a9b-e6e3-4834-919c-b68965156f83
+:END:
+#+begin_src emacs-lisp
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
+(when (< emacs-major-version 24)
+  ;; For important compatibility libraries like cl-lib
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+(package-initialize)
+#+end_src
+* Helper Functions
+** Strings
+:PROPERTIES:
+:ID:       f225a8bf-89d4-444d-99b1-e89c67f037bc
+:END:
+Taken from [[http://emacswiki.org/emacs/ElispCookbook#toc4][EmacsWiki: Elisp Cookbook]].
+#+begin_src emacs-lisp
+(defun string/ends-with (string suffix)
+      "Return t if STRING ends with SUFFIX."
+      (and (string-match (rx-to-string `(: ,suffix eos) t)
+                         string)
+           t))
+#+end_src
+* Modes
+** Groovy
+:PROPERTIES:
+:ID:       c0a38540-46e5-466e-bc44-a7bcc543f878
+:END:
+#+begin_src emacs-lisp
+;;; turn on syntax highlighting
+(global-font-lock-mode 1)
+
+;;; use groovy-mode when file ends in .groovy or has #!/bin/groovy at start
+(autoload 'groovy-mode "groovy-mode" "Major mode for editing Groovy code." t)
+(add-to-list 'auto-mode-alist '("\.groovy$" . groovy-mode))
+(add-to-list 'interpreter-mode-alist '("groovy" . groovy-mode))
+
+;;; make Groovy mode electric by default.
+(add-hook 'groovy-mode-hook
+          '(lambda ()
+             (require 'groovy-electric)
+             (groovy-electric-mode)))
+#+end_src
+** Latex Pretty Symbols
+:PROPERTIES:
+:ID:       1b3cf9cc-2975-4ac3-83f6-2a1f108027ee
+:END:
+See [[id:d7e5be82-1817-4f65-8b20-831779a427a3][Displaying latex commands as unicode characters]] for more info on this library. Meanwhile it's commented out since I think org pretty entities does pretty much the same job.
+#+begin_src emacs-lisp
+;(add-to-list 'load-path "~/build/emacs/latex-pretty-symbols.el")
+;(require 'latex-pretty-symbols)
+;(add-hook 'org-mode-hook 'latex-unicode-simplified)
+#+end_src
+** Objective C
+:PROPERTIES:
+:ID:       b9fcf3bd-f26d-4fa9-95b1-458a9f37a7dd
+:END:
+#+begin_src emacs-lisp
+(require 'objc-font-lock)
+(objc-font-lock-global-mode 1)
+#+end_src
+** Show Paren Mode
+:PROPERTIES:
+:ID:       25afb526-df8f-4280-a26a-25b29eb8fdc9
+:END:
+For now make it for everything:
+#+begin_src emacs-lisp
+(show-paren-mode)
+#+end_src
+** Visual Basic Mode
+:PROPERTIES:
+:ID:       68d5c7a4-5314-41b9-ab66-bb65791aa35e
+:END:
+#+begin_src emacs-lisp
+(require 'visual-basic-mode)
+#+end_src
+** vbscript mode
+:PROPERTIES:
+:ID:       b974ed06-64b8-41e6-af5f-8764fbbcea15
+:END:
+Taken from [[http://www.emacswiki.org/emacs/VbsReplMode][EmacsWiki: Vbs Repl Mode]].
+#+begin_src emacs-lisp
+(require 'vbs-repl)
+
+; VBScript editing
+(setq auto-mode-alist
+      (append '(("\\.\\(vbs\\|wsf\\)$" . vbscript-mode))
+              auto-mode-alist))
+#+end_src
+** AutoHotKey Mode
+:PROPERTIES:
+:ID:       b2d4bd64-3227-4020-b26d-fba84b58ea0b
+:END:
+Meanwhile ahk-mode doesn't work, so I'm using xahk-mode instead
+#+begin_src emacs-lisp
+(require 'xahk-mode)
+;;(require 'ahk-mode)
+#+end_src
+** Nix Mode
+:PROPERTIES:
+:ID:       3fd6cc8e-adfe-40fa-ad34-6d5fe3174154
+:END:
+#+begin_src emacs-lisp
+(require 'nix-mode)
+#+end_src
+* Polymode
+:PROPERTIES:
+:ID:       ff981f9f-f0d6-4634-b639-7dde7a11af76
+:END:
+** Loading the modes
+:PROPERTIES:
+:ID:       08e928e8-7a73-4836-b8e7-0bffa01ba38b
+:END:
+#+begin_src emacs-lisp
+(autoload 'poly-custom-org-mode "poly-custom-org")
+
+(autoload 'poly-java+org-mode "poly-java")
+(add-to-list 'auto-mode-alist '("\\.java\\'" . poly-java+org-mode))
+#+end_src
+** A hack to avoid the jump when hitting a chunk for the first time
+:PROPERTIES:
+:ID:       07a61c11-6b5a-461a-bbd3-cbe2cb72d0d0
+:END:
+Polymode [[id:11e4e284-733a-428c-bf60-2da04127568d][Jumps and closes all entries when hitting first chunk]] explains the bug. Right now the ~poly-custom-org~ head and tail mode are disabled to prevent it. They can be enabled them by using ~C-c p s~ above the source block, and after it jumps pressing ~C-c p g~ to go back to where you were. It works by turning on another polymode where the head and tail modes are ~org-mode~, so that one can retain all the related features (hiding, ~C-c C-c~, etc.).
+#+begin_src emacs-lisp
+(autoload 'poly-custom-org-htd-mode "poly-custom-org-htd")
+;;(add-to-list 'auto-mode-alist '("\\.org\\'" . poly-custom-org-htd-mode))
+
+(defun turn-poly-ht-on ()
+  (interactive)
+  (setq bookmark (bookmark-set "ht-bookmark"))
+  (org-mode)
+  (poly-custom-org-mode)
+  (forward-line)
+  (bookmark-jump "ht-bookmark")
+  )
+
+
+(global-set-key (kbd "C-c p s") 'turn-poly-ht-on)
+(global-set-key (kbd "C-c p g") (lambda () (interactive) (bookmark-jump "ht-bookmark")))
+#+end_src
+* Theme
+** Programming languages theme
+:PROPERTIES:
+:ID:       ad10d006-ed05-4e94-81d8-cb589a2b55b0
+:END:
+#+begin_src emacs-lisp
+(defun adjust-prog-face (face)
+  (set-face-attribute face nil :family "Inconsolata" :foundry "unknown" :height org-theme-base-font-size)
+  )
+
+(defun prog-theme ()
+  (adjust-prog-face 'default)
+)
+
+(add-hook 'prog-mode-hook 'prog-theme)
+#+end_src
+* Org-mode
+:PROPERTIES:
+:ID:       14777572-aeb4-4fc3-a4ba-315d6310fec8
+:END:
+** Building from the sources
+:PROPERTIES:
+:ID:       ed1ccf34-76b4-4906-a19c-1101cb489961
+:END:
+#+begin_src emacs-lisp
+;; The following lines are for getting org-mode from the development version
+(setq load-path (cons "~/org-mode/lib/emacs/org-mode/lisp" load-path))
+(setq load-path (cons "~/org-mode/lib/emacs/org-mode/contrib/lisp"
+                      load-path))
+
+(require 'org-install)
+#+end_src
+** Images
+:PROPERTIES:
+:ID:       b2b66bf3-45b7-435d-a627-545850431c3c
+:END:
+#+begin_src emacs-lisp
+;;(add-to-list 'dynamic-library-alist '(jpg "imagemagick"))
+(setq org-image-actual-width nil)
+#+end_src
+*** Make emacs use imagemagick
+:PROPERTIES:
+:ID:       d308e22a-cbd5-442a-a8f4-cae1262958b8
+:END:
+Taken from [[http://emacs.stackexchange.com/questions/2433/shrink-zoom-scale-images-in-image-mode][Shrink/Zoom/Scale images in image-mode - Emacs Stack Exchange's answer]]
+#+begin_src emacs-lisp
+(setq image-type-header-regexps
+      `(
+        ("\\`/[\t\n\r ]*\\*.*XPM.\\*/" . xpm)
+        ("\\`P[1-6]\\\(?:\
+              \\(?:\\(?:#[^\r\n]*[\r\n]\\)?[[:space:]]\\)+\
+              \\(?:\\(?:#[^\r\n]*[\r\n]\\)?[0-9]\\)+\
+              \\)\\{2\\}" . pbm)
+        ("\\`GIF8[79]a" . gif)
+        ;; ("\\`\x89PNG\r\n\x1a\n" . png) ;; Uncomment this (and comment the below line) to enable inline png images in org-mode
+        ("\\`\x89PNG\r\n\x1a\n" . imagemagick) ; png
+        ("\\`[\t\n\r ]*#define \\([a-z0-9_]+\\)_width [0-9]+\n\
+              #define \\1_height [0-9]+\n\\(\
+              #define \\1_x_hot [0-9]+\n\
+              #define \\1_y_hot [0-9]+\n\\)?\
+              static \\(unsigned \\)?char \\1_bits" . xbm)
+        ;; ("\\`\\(?:MM\0\\*\\|II\\*\0\\)" . tiff)
+        ("\\`\\(?:MM\0\\*\\|II\\*\0\\)" . imagemagick) ; tiff
+        ("\\`[\t\n\r ]*%!PS" . postscript)
+        ;; ("\\`\xff\xd8" . jpeg) ;; Uncomment this (and comment the below line) to enable inline jpg images in org-mode
+        ("\\`\xff\xd8" . imagemagick)    ; jpeg
+        ("\\`\377\330" . imagemagick)    ; jpeg
+        (,(let* ((incomment-re "\\(?:[^-]\\|-[^-]\\)")
+                 (comment-re (concat "\\(?:!--" incomment-re "*-->[ \t\r\n]*<\\)")))
+            (concat "\\(?:<\\?xml[ \t\r\n]+[^>]*>\\)?[ \t\r\n]*<"
+                    comment-re "*"
+                    "\\(?:!DOCTYPE[ \t\r\n]+[^>]*>[ \t\r\n]*<[ \t\r\n]*" comment-re "*\\)?"
+                    "[Ss][Vv][Gg]"))
+         ;; . svg)  ;; Uncomment this (and comment the below line) to enable inline svg images in org-mode
+         . imagemagick) ; svg
+        ))
+#+end_src
+** Academic
+:PROPERTIES:
+:ID:       c568abb0-c050-44ac-bb28-3923cf87dadd
+:END:
+*** Citing an article
+:PROPERTIES:
+:ID:       e1eaa7a8-ff5e-483d-b24e-898c88b24d6f
+:END:
+This is for citing an article with a =bibtex= property
+#+begin_src emacs-lisp
+(defun org-cite ()
+  (interactive)
+  (let* ((citation-string (concat "\\cite{" (org-entry-get nil "bibtex") "}")))
+  (message "citation string \"%s\" copied to kill-ring" citation-string)
+  (kill-new citation-string)))
+
+(global-set-key (kbd "C-c c") 'org-cite)
+#+end_src
+*** Removing the references heading
+:PROPERTIES:
+:ID:       84521b2c-fa7c-427b-ac45-ebf4ce5eefe1
+:END:
+#+begin_src emacs-lisp
+(defun org-export-latex-remove-references-heading (contents backend info)
+    (if (not (eq backend 'latex))
+	contents
+      (replace-regexp-in-string "\\\\section\\*?{References}\\s-*\\\\label{.*?}" "" contents)
+      ))
+
+(add-hook 'org-export-filter-final-output-functions 'org-export-latex-remove-references-heading)
+#+end_src
+** Hooks
+:PROPERTIES:
+:ID:       fffcaa4f-4c9b-427a-ad49-28ba59707c05
+:END:
+#+begin_src emacs-lisp
+;;(add-hook 'org-mode-hook 'org-goto-current-stage)
+#+end_src
+** org-protocol
+:PROPERTIES:
+:ID:       816bac5d-e72a-4009-bad7-8a4e056de518
+:END:
+#+begin_src emacs-lisp
+(load "server")
+(unless (server-running-p) (server-start))
+(require 'org-protocol)
+#+end_src
+** File Associations
+:PROPERTIES:
+:ID:       390679e5-2887-4bc4-a265-a36cabce31ee
+:END:
+Taken from [[http://stackoverflow.com/questions/8834633/how-do-i-make-org-mode-open-pdf-files-in-evince][emacs - How do I make Org-mode open PDF files in Evince? - Stack Overflow's answer]].
+#+begin_src emacs-lisp
+(setcdr (assoc "\\.pdf\\'" org-file-apps) "evince %s")
+#+end_src
+*** References
+| Link                                                      | Search                            | Comment          |
+|-----------------------------------------------------------+-----------------------------------+------------------|
+| [[http://stackoverflow.com/a/9116029/1346426][How do I make Org-mode open PDF files in Evince?'s answer]] |                                   | Solution         |
+| [[http://stackoverflow.com/a/3985552/1346426][Emacs org-mode file/viewer associations's answer]]          |                                   | Another solution |
+| [[http://orgmode.org/worg/org-faq.html][Org-mode Frequently Asked Questions]]                       | How can I control the application | Documentation    |
+<2015-08-14 Fri>
+** Org link minor mode
+:PROPERTIES:
+:ID:       f6db479c-ad6c-4f1d-b0d8-bd47a8a4c1f4
+:END:
+#+begin_src emacs-lisp
+(setq load-path (cons "~/org-mode/lib/emacs/org-link-minor-mode" load-path))
+(require 'org-link-minor-mode)
+#+end_src
+** Appearance
+:PROPERTIES:
+:ID:       de0a5944-c981-4945-b54c-196165e3d720
+:END:
+*** Variable Pitch Mode
+:PROPERTIES:
+:ID:       17c2bc92-2ffa-4061-a001-5b04a3fd64c5
+:END:
+The only font that seems to work perfectly with ~org-indent-mode~ is ~Sans Serif~, which is the default of ~variable-pitch~. Using differnet fonts causes the indentation to change with each heading level. [[http://lists.gnu.org/archive/html/emacs-orgmode/2014-10/msg00661.html][(O) (Bug) org-indent-mode underindents body in variable-pitch-mode]] discusses the subject. I chose ~Arial~ because the offset is not that noticable.
+#+begin_src emacs-lisp
+(setq org-startup-indented t)
+
+(defun turn-on-variable-pitch-mode ()
+  "variable-pitch-mode is an interface to buffer-face-mode, so I'm only calling the function when it's turned off,
+to avoid turning it on and then off again (it happened to me in java-mode)"
+  (when (not (bound-and-true-p buffer-face-mode)) (variable-pitch-mode))
+  )
+
+(defun custom-variable-pitch-mode ()
+  (turn-on-variable-pitch-mode)
+  (set-face-attribute buffer-face-mode-face nil :family "DejaVu Serif" :foundry "unknown" :height org-theme-base-font-size)
+  (set-face-attribute 'org-indent nil :family "courier" :foundry "unknown" :inherit 'fixed-width :height 120)
+  )
+
+;;(add-hook 'org-mode-hook 'custom-variable-pitch-mode)
+#+end_src
+*** Colors and Fonts
+:PROPERTIES:
+:ID:       e19ae860-8fc6-446c-a8d1-a7c3df003812
+:END:
+Setting base font size
+#+begin_src emacs-lisp
+(setq org-theme-base-font-size 180)
+#+end_src
+A simple scaling function
+#+begin_src emacs-lisp
+(defun get-scaled-font-size (scaling)
+  (round (* scaling org-theme-base-font-size)))
+#+end_src
+Hiding the emphasis markers:
+#+begin_src emacs-lisp
+;;(setq org-hide-emphasis-markers t)
+(setq org-fontify-emphasized-text nil)
+#+end_src
+The ~org-meta-visible-color~ and ~org-special-visible-color~ are created by taking the visible color and decreasing the saturation to the desired level. The ~org-table~ color was chosen the same way by using ~org-level-2-color~, but with also increasing the value so it would be darker.
+#+begin_src emacs-lisp
+(defvar org-level-1-color "#485EEF")
+(defvar org-level-2-color "#7344EE")
+(defvar org-level-3-color "#B841EE")
+(defvar org-level-4-color "#EE3EDC")
+(defvar org-level-5-color "#ED3A92")
+(defvar org-level-6-color "#ED3745")
+(defvar org-level-7-color "#ED7134")
+(defvar org-level-8-color "#EDBC31")
+
+(defvar org-meta-visibility nil)
+(defvar org-meta-visible-color org-level-4-color)
+(defvar org-meta-invisible-color "#EEC8EA")
+;; Temporary hack to allow readable mode
+(global-set-key (kbd "C-c w") (lambda () (interactive) (setq org-meta-invisible-color "#FFFFFF")))
+(global-set-key (kbd "C-c o") (lambda () (interactive) (setq org-meta-invisible-color "#EEC8EA")))
+
+(defvar org-meta-invisible-color "#FFFFFF")
+(defvar org-special-visible-color org-level-3-color)
+(defvar org-special-invisible-color "#E0BEEE")
+(defun org-meta-switch-visibility ()
+  "Switches meta data visibility"
+  (interactive)
+  (if org-meta-visibility
+      (progn 
+	(set-face-foreground 'org-meta-line org-meta-invisible-color)
+	(mapcar 
+	 (lambda (face) (set-face-foreground face org-special-invisible-color))
+	 (list 'org-special-keyword 'org-property-value 'org-date 'org-target))
+	(setq org-meta-visibility nil))
+    (progn 
+      (set-face-foreground 'org-meta-line org-meta-visible-color)
+      (mapcar 
+       (lambda (face) (set-face-foreground face org-special-visible-color))
+       (list 'org-special-keyword 'org-property-value 'org-date 'org-target))
+      (setq org-meta-visibility t)))
+)
+
+(global-set-key (kbd "C-z") 'org-meta-switch-visibility)
+
+;; Fonts and Colors
+(defun org-set-theme ()
+  ;; This is to have indentation of word wrap (should be before the faces are set)
+  ;; Setting faces
+  (set-face-foreground 'org-level-1 org-level-1-color)
+  (set-face-foreground 'org-level-2 org-level-2-color)
+  (set-face-foreground 'org-level-3 org-level-3-color)
+  (set-face-foreground 'org-level-4 org-level-4-color)
+  (set-face-foreground 'org-level-5 org-level-5-color)
+  (set-face-foreground 'org-level-6 org-level-6-color)
+  (set-face-foreground 'org-level-7 org-level-7-color)
+  (set-face-foreground 'org-level-8 org-level-8-color)
+  (mapcar 'adjust-prog-face
+	  (list 'org-block 'org-code 'org-verbatim 'org-meta-line 'org-special-keyword 'org-property-value 'org-target))
+  (set-face-attribute 'org-block nil :inherit (quote fixed-pitch))
+  (set-face-attribute 'org-code nil :inherit (quote fixed-pitch) :height org-theme-base-font-size)
+  (set-face-attribute 'org-verbatim nil :inherit (quote fixed-pitch) :height org-theme-base-font-size)
+  (set-face-attribute 'org-meta-line nil :inherit (quote fixed-pitch) :foreground 
+		      (if org-meta-visibility org-meta-visible-color org-meta-invisible-color))
+
+(set-face-attribute 'org-special-keyword nil :inherit (quote fixed-pitch) :foreground org-special-invisible-color :height (get-scaled-font-size 0.926))
+  (set-face-attribute 'org-property-value nil :inherit (quote fixed-pitch) :foreground org-special-invisible-color :height (get-scaled-font-size 0.926))
+  (set-face-attribute 'org-date nil :inherit (quote fixed-pitch) :foreground org-special-invisible-color :height (get-scaled-font-size 0.853))
+  (set-face-attribute 'org-target nil :inherit (quote fixed-pitch) :foreground org-special-invisible-color :height (get-scaled-font-size 0.853))  
+  (set-face-attribute 'org-table nil :inherit (quote fixed-pitch) :foreground "#7F7D9C" :height (get-scaled-font-size 0.853)))
+
+(add-hook 'org-mode-hook 'org-set-theme)
+#+end_src
+*** Org Bullets
+:PROPERTIES:
+:ID:       98571f7f-b443-4415-ae56-349df4a4b27f
+:END:
+#+begin_src emacs-lisp
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+*** Hidden keywords
+:PROPERTIES:
+:ID:       b63fe12c-bb19-4d03-b5f2-3d8bf40f197f
+:END:
+Hides the following keywords
+#+begin_src emacs-lisp
+(setq org-hidden-keywords (quote (author date email title)))
+#+end_src
+** Mobile Org
+:PROPERTIES:
+:ID:       9f701130-8795-46f6-ac65-ff55e78e4cf3
+:END:
+Sets the files for mobile-org to push. In order to generate the list automatically, use [[id:259c60e3-99b7-40a0-a8a1-a4f8181a4e23][Choosing files to push]].
+#+begin_src emacs-lisp
+(setq org-mobile-files (mapcar (lambda (org-file-name) (concat "~/org-mode/" org-file-name ".org"))
+	'("agenda" "babel-lib" "hebrew" "index" "init" "personal" "qc" "snippets" "sw" "temp" "test" "torah")))
+#+end_src
+
+Sets the location of your Org files on your local system
+#+begin_src emacs-lisp
+(setq org-directory "~/org-mode")
+#+end_src
+
+Sets the name of the file where new notes will be stored
+#+begin_src emacs-lisp
+(setq org-mobile-inbox-for-pull "~/org-mode/flagged.org")
+#+end_src
+
+Should be set to <your Dropbox root directory>/MobileOrg.
+#+begin_src emacs-lisp
+(setq org-mobile-directory "~/Dropbox/Apps/mobileorg")
+#+end_src
+
+Making an automatic pull and push, taken from [[http://stackoverflow.com/a/8432149/1346426][How to automatically do org-mobile-push org-mobile pull in emacs's answer]].
+Right now it's commented out since I want to use a different method for doing it.
+#+begin_src emacs-lisp
+;;(add-hook 'after-init-hook 'org-mobile-pull)
+;;(add-hook 'kill-emacs-hook 'org-mobile-push) 
+#+end_src
+** Org Prettify
+:PROPERTIES:
+:ID:       122788aa-2f5b-4bdb-8e15-0933913a4361
+:END:
+*** Source block keywords
+:PROPERTIES:
+:ID:       30df96a0-d08d-49bc-975b-47cbc02e6409
+:END:
+#+begin_src emacs-lisp
+(defun org-prettify-source-block-keywords (limit)
+  (let ((case-fold-search t))
+    (if (re-search-forward
+	 "^[ \t]*\\(#\\+\\(begin\\|end\\)_src\\).*$"
+	 limit t)
+	(let ((beg (match-beginning 1))
+	      (end (match-end 1)))
+	  (cond 
+	   ((equal (match-string 1) "#+begin_src")
+	    (compose-region beg end
+			    "\u25B6" nil))
+	   ((equal (match-string 1) "#+end_src")
+	    (compose-region beg end
+			    "\u25FE" nil))
+	   )))))
+#+end_src
+*** Fontify latex fragments
+:PROPERTIES:
+:ID:       aa7fa29b-c099-41d2-a6d1-c9b893e9638d
+:END:
+See [[id:a32677c0-d171-4d4a-9d4d-0659da1438fc][The emphasis regular expression]] for an explanation how I constructed this regexp.
+#+begin_src emacs-lisp
+(setq latex-re "\\([ \t('\"{]\\|^\\)\\(\\([$]\\)\\([^ \t\r\n,\"']\\|[^ \t\r\n,\"'].*?\\(?:\n.*?\\)\\{0,1\\}[^ \t\r\n,\"']\\)\\3\\)\\([- \t.,:!?;'\")}\\[]\\|$\\)")
+#+end_src
+This is actually almost a copy of the ~[[file:elisp/org-mode/org.el::(defun%20org-do-emphasis-faces%20(limit)][org-do-emphasis-faces]]~ function that's in charge of adding the faces to the emphasized texts and making the markers invisible if so configured. This can be done more simply but it has issues, see [[id:105bca01-668c-48a3-8e92-fb40d9300df2][Customizing the emphasis markers to include latex fragments]].
+#+begin_src emacs-lisp
+;;(defvar org-latex-fragment-color "#808EE8")
+(defvar org-latex-fragment-color "red")
+(setq org-pretty-latex t)
+(defun org-fontify-latex-fragments (limit)
+  "Run through the buffer and fontify latex fragments."
+  (if org-pretty-latex
+      (let (rtn a)
+	(while (and (not rtn) (re-search-forward latex-re limit t))
+	  (let* ((border (char-after (match-beginning 3)))
+		 (bre (regexp-quote (char-to-string border))))
+	    (if (and (not (= border (char-after (match-beginning 4))))
+		     (not (save-match-data
+			    (string-match (concat bre ".*" bre)
+					  (replace-regexp-in-string
+					   "\n" " "
+					   (substring (match-string 2) 1 -1))))))
+		(progn
+		  (setq rtn t)
+		  (setq a (assoc (match-string 3) org-emphasis-alist))
+		  (font-lock-prepend-text-property (match-beginning 2) (match-end 2)
+						   'face
+						   '(:family "CMU Serif" :foundry "unknown" :foreground "#D4195B"))
+		  ;;'(:family "CMU Sans Serif" :foundry "unknown"))
+		  ;;'(:family "CMU Typewriter Text" :foundry "unknown"))
+		  ;;'(:family "CMU Typewriter Text Variable Width" :foundry "unknown"))
+		  ;;'(:family "Asana Math" :foundry "unknown"))
+		  (and (nth 2 a)
+		       (org-remove-flyspell-overlays-in
+			(match-beginning 0) (match-end 0)))
+		  ;; (add-text-properties (match-beginning 2) (match-end 2)
+		  ;; 			   '(font-lock-multiline t org-emphasis t))
+		  (when org-hide-emphasis-markers
+		    (add-text-properties (match-end 4) (match-beginning 5)
+					 '(invisible org-link))
+		    (add-text-properties (match-beginning 3) (match-end 3)
+					 '(invisible org-link))))))
+	  (goto-char (1+ (match-beginning 0))))
+	rtn)))
+#+end_src
+*** Fontifying also complex latex entities
+:PROPERTIES:
+:ID:       aa5413cc-e569-4676-a963-8467e039a640
+:END:
+See [[id:d7e5be82-1817-4f65-8b20-831779a427a3][Displaying latex commands as unicode characters]] for a research of other methods of doing so.
+#+begin_src emacs-lisp
+(defun org-make-complex-latex-entities (limit)
+  (let ((case-fold-search t))
+    (if (re-search-forward
+         ;;"[\\]\\(bar\\|ket\\|bra\\|text\\){\\([^{]*?\\)}"
+         "[\\]\\(bar\\|ket\\|bra\\){\\([^{]*?\\)}" ; currently ommitting text
+         limit t)
+        (let ((beg (match-beginning 2))
+	      (end (match-end 2)))
+	  (cond ((equal (match-string 1) "ket")
+		 (compose-region (match-beginning 0) beg
+				 "|" nil)
+		 (compose-region end (match-end 0)
+				 "\u27E9" nil))
+		((equal (match-string 1) "bra")
+		 (compose-region (match-beginning 0) beg
+				 "\u27E8" nil)
+		 (compose-region end (match-end 0)
+				 "|" nil))
+		((equal (match-string 1) "bar")
+		 (compose-region (match-beginning 0) beg
+				 "" nil)
+		 (compose-region end (match-end 0)
+				 "\u0304" nil))
+		((equal (match-string 1) "text")
+		 (compose-region (match-beginning 0) beg
+				 "" nil)
+		 (compose-region end (match-end 0)
+				 "" nil))
+		)))))
+#+end_src
+*** Adding org-prettify functions to the font lock keywords hook
+:PROPERTIES:
+:ID:       58232964-eecd-4646-b949-6337ccec1eb8
+:END:
+#+begin_src emacs-lisp
+(add-hook 'org-font-lock-set-keywords-hook 
+	  (lambda ()
+	    (let ((m (member '(org-fontify-meta-lines-and-blocks) org-font-lock-extra-keywords)))
+	      (if m
+                    (setcdr m (cl-list* 
+			       '(org-make-complex-latex-entities)
+			       '(org-prettify-source-block-keywords)
+			       '(org-fontify-latex-fragments) (cdr m)))
+		  
+		  (message
+		   "Failed to add org-prettify to `org-font-lock-extra-keywords'.")))))
+#+end_src
+** Babel
+:PROPERTIES:
+:ID:       abb35064-c275-4f45-b88f-c1f2df5cc630
+:END:
+*** Language support
+:PROPERTIES:
+:ID:       b34090dc-d759-47b2-9382-80f04019f20d
+:END:
+#+begin_src emacs-lisp
+(require 'ob-python)
+(require 'ob-sh)
+(require 'ob-haskell)
+(require 'ob-latex)
+(require 'ob-R)
+(require 'ob-emacs-lisp)
+(require 'ob-scala)
+;;(require 'ob-matlab)
+(require 'ob-octave)
+(require 'ob-maxima)
+(require 'ob-ref)
+(require 'ob-tcl)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((maxima . t)
+   (haskell . t)
+   (sh . t)))
+#+end_src
+*** Confirming when evaluating
+:PROPERTIES:
+:ID:       d2156965-e6f1-43fc-8f15-3419a700d9e3
+:END:
+#+begin_src emacs-lisp
+(setq org-confirm-babel-evaluate t)
+(global-set-key (kbd "C-c e c") (lambda () (interactive) (setq org-confirm-babel-evaluate nil)))
+#+end_src
+*** Haskell
+:PROPERTIES:
+:ID:       df678da9-a2f6-467f-aef9-2e72854ec78f
+:END:
+
+This is in order to compile a Haskell code block tangled file, and create a diagram.
+#+begin_src emacs-lisp :results silent
+(defun compile-haskell ()
+  (when (derived-mode-p 'sr-mode 'haskell-mode)
+    (let ((file-name (buffer-file-name (current-buffer))))
+      (string-match "\\(^.*\\)/\\([^/].*\\)\\.hs$" file-name)
+      (let* ((path (match-string 1 file-name))
+	     (diagram-name (match-string 2 file-name))
+	     (executable (match-string 2 file-name))
+	     (image-file-name (concat path "/images/" diagram-name ".svg"))
+	     )
+	(call-process-shell-command (concat "rm " executable))
+	(message (shell-command-to-string (concat "ghc --make " file-name)))
+	(when (string-match "Diagram B R2" (buffer-string))
+	  (while (not (file-exists-p executable)))
+	  (call-process-shell-command (concat "rm " image-file-name))
+	  (while (< 0 (length (shell-command-to-string (concat path "/" executable " -o " image-file-name " -h 400 -w 1500")))))
+	  )))))
+
+;(add-hook 'org-babel-post-tangle-hook 'compile-haskell)
+#+end_src
+
+This is a key binding to perform the tangle of a haskell block and display the image
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c h") 
+                (lambda () 
+                  (interactive)
+                  ;;(re-search-forward "#\\+end_src")
+                  ;;(backward-char)
+                  (org-babel-tangle '(4))
+                  (org-display-inline-images)
+                  )
+                )
+#+end_src
+*** shell
+:PROPERTIES:
+:ID:       015d72d3-a269-4b4d-8680-0207531dfa34
+:END:
+#+begin_src emacs-lisp
+(setq org-babel-sh-command "bash -i")
+#+end_src
+*** Library of Babel
+:PROPERTIES:
+:ID:       6ee0897e-fef9-4ec6-84ab-39a054fa08d4
+:END:
+#+begin_src emacs-lisp
+(defun org-babel-setup ()
+  (if (and (stringp (buffer-file-name)) (not (string/ends-with (buffer-file-name) "babel-lib.org")))
+      (org-babel-lob-ingest "/home/amitai/org-mode/babel-lib.org")))
+  ;;(org-babel-lob-ingest "/home/amitai/build/emacs/org-mode/doc/library-of-babel.org")
+
+(add-hook 'org-mode-hook 'org-babel-setup)
+#+end_src
+** Tasks Management
+:PROPERTIES:
+:ID:       f3e3d3e0-ad39-42ad-b220-a41b4c4e0a21
+:END:
+#+begin_src emacs-lisp
+;; TODO settings
+(setq org-todo-keywords
+      (quote (
+              (sequence "WAITING(w)" "HOLD(h)" "|" "CANCELLED(c)")
+              (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+              )))
+
+(setq org-todo-keyword-faces
+      (quote (("TODO" :foreground "forest green" :weight bold)
+              ("NEXT" :foreground "blue" :weight bold)
+              ("DONE" :foreground "grey" :weight bold)
+              ("WAITING" :foreground "DarkSeaGreen" :weight bold)
+              ("HOLD" :foreground "honeydew3" :weight bold)
+              ("CANCELLED" :foreground "grey" :weight bold))))
+
+                                        ;(setq org-enforce-todo-dependencies t)
+
+;; Logging todo state changes into drawers
+(setq  org-log-into-drawer t)
+
+(require 'org-depend)
+
+;; (setq org-todo-state-tags-triggers
+;;       (quote (("CANCELLED" ("CANCELLED" . t))
+;;               ("WAITING" ("WAITING" . t))
+;;               ("HOLD" ("WAITING") ("HOLD" . t))
+;;               (done ("WAITING") ("HOLD"))
+;;               ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+;;               ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+;;               ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+
+(setq org-use-fast-todo-selection t)
+(setq org-edit-src-content-indentation 0)
+
+(defun amitai/org-add-appropriate-drawer ()
+  "Insert the appropriate drawer"
+  (goto-char (org-log-beginning))
+  (when (and (looking-at org-drawer-regexp) (string= (match-string-no-properties 1) org-last-state))
+    (let ((drawer (org-element-at-point)))
+      (delete-region (org-element-property :begin drawer)
+                     (progn (goto-char (org-element-property :end drawer))
+                            (skip-chars-backward " \r\t\n")
+                            (forward-line)
+                            (point)
+                            ))))
+  (when (member org-state '("WAITING" "HOLD" "CANCELLED"))  
+    (org-insert-drawer nil org-state)
+    (message "Inserted drawer")
+    (show-entry)))
+
+(add-hook 'org-after-todo-state-change-hook
+          'amitai/org-add-appropriate-drawer)
+
+;; org agenda commands
+(setq case-fold-search nil)
+(setq org-agenda-custom-commands
+      '(("n" occur-tree "^[\\*]+ TODO\\|^[\\*]+ NEXT")))
+#+end_src
+** Links
+*** Confirming execution
+:PROPERTIES:
+:ID:       703de3e0-97bf-4df2-8fc6-601c89e48c7e
+:END:
+#+begin_src emacs-lisp
+(setq org-confirm-shell-link-function 'y-or-n-p)
+(setq org-confirm-elisp-link-function 'y-or-n-p)
+#+end_src
+*** Keybindings
+:PROPERTIES:
+:ID:       c077adf9-812a-4d8f-b97c-caaaa9fdb53d
+:END:
+#+begin_src emacs-lisp
+(global-set-key (kbd "<M-backspace>") 'org-mark-ring-goto)
+#+end_src
+*** Supporting brackets in link searches for programming modes
+:PROPERTIES:
+:ID:       8251140e-95c6-4eb9-99e5-f95624f8b876
+:END:
+#+begin_src emacs-lisp
+(add-hook 'org-create-file-search-functions
+	  '(lambda ()
+	     (when (derived-mode-p 'sr-mode 'prog-mode)
+	       (progn
+		 (setq description (if (org-region-active-p)
+				       (buffer-substring (region-beginning) (region-end))
+				     "this function"))
+		 (replace-regexp-in-string 
+		  "\\]" "\\\\]"
+		  (replace-regexp-in-string 
+		   "\\[" "\\\\["
+		   (org-make-org-heading-search-string
+		    (buffer-substring (point-at-bol) (point-at-eol)))))))))
+#+end_src
+** Misc
+:PROPERTIES:
+:ID:       837e9fe2-4f5f-469a-9873-147c9fadd534
+:END:
+#+begin_src emacs-lisp
+;; Make RET goes to a link
+(setq org-return-follows-link t)
+
+;; Enable property inheritance
+(setq org-use-property-inheritance t)
+
+;; This is for generation of uniqe ID when storing a link
+(setq org-link-to-org-use-id t)
+
+;; The following lines are always needed.  Choose your own keys.
+(require 'org-id)
+(add-hook 'org-mode-hook 'turn-on-font-lock) ; not needed when global-font-lock-mode is on
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+#+end_src
+** Key Bindings
+:PROPERTIES:
+:ID:       e8f88acc-f90f-4bfc-a6a7-993ec221f5a8
+:END:
+#+begin_src emacs-lisp
+(fset 'org-export-last
+   "\C-u\C-c\C-e")
+(fset 'org-preview-subtree
+   "\C-u\C-u\C-c\C-x\C-l")
+(fset 'org-preview-current
+   "\C-c\C-x\C-l")
+(fset 'org-pretty
+   "\C-c\C-x ?\\")
+(fset 'org-inline-images
+   "\C-c\C-x\C-v")
+(fset 'org-update
+   "\C-c\C-c")
+(fset 'org-indent-code-block
+   [?\C-c ?\' ?\C-x ?h tab ?\C-c ?\'])
+(fset 'autocomplete
+   [escape tab])
+(fset 'expand
+   "\257")
+(fset 'org-open-attachment
+   "\C-c\C-ao")
+(fset 'org-agenda-subtree-todo
+   "\C-ca<<t")
+
+; This is required in order to jump to a headline
+(setq org-link-search-must-match-exact-headline nil)
+(defun org-goto-next-task ()
+  (interactive)
+  (org-global-cycle 1)
+  (org-open-link-from-string "[[* NEXT]]")
+  (outline-up-heading 1)
+  (show-children)
+  (org-open-link-from-string "[[* NEXT]]")
+  (show-entry)
+  (org-reveal)
+  )
+
+(defun org-goto-current-stage ()
+  "Goes to a link marked <<current-stage>>"
+  ;; This function does not work when org-startup-with-latex-preview is t
+  (interactive)
+  (org-global-cycle 1)
+  (org-open-link-from-string "[[current-stage]]")
+  (outline-up-heading 1)
+  (show-children)
+  (org-open-link-from-string "[[current-stage]]")
+  (org-reveal)
+  )
+
+(defun org-goto-current-article ()
+  "Goes to a link marked <<current-stage>>"
+  ;; This function does not work when org-startup-with-latex-preview is t
+  (interactive)
+  (org-global-cycle 1)
+  (org-open-link-from-string "[[current-article]]")
+  (outline-up-heading 1)
+  (show-children)
+  (org-open-link-from-string "[[current-article]]")
+  (org-reveal)
+  )
+
+(defun org-goto-next-bookmark ()
+  "Goes to a bookmark marked <<bookmark>>"
+  ;; This function does not work when org-startup-with-latex-preview is t
+  (interactive)
+  (org-global-cycle 1)
+  (search-forward-regexp "<<bookmark>>")
+  (show-entry)
+  (outline-up-heading 1)
+  (show-children)
+  (search-forward-regexp "<<bookmark>>")
+  (org-reveal)
+  )
+
+(defun org-goto-previous-bookmark ()
+  "Goes to a bookmark marked <<bookmark>>"
+  ;; This function does not work when org-startup-with-latex-preview is t
+  (interactive)
+  (org-global-cycle 1)
+  (search-backward-regexp "<<bookmark>>")
+  (show-entry)
+  (outline-up-heading 1)
+  (show-children)
+  (search-backward-regexp "<<bookmark>>")
+  (org-reveal)
+  )
+
+(defun org-open-current-article ()
+  "Goes to a link marked <<current-article>>
+I and then opens the attachment.
+I tried using (call-interactively 'org-attach-open) but it needs to open the attachment
+menu first, so on startup the function won't work."
+  (interactive)
+  (org-open-link-from-string "[[current-article]]")
+  (execute-kbd-macro 'org-open-attachment)
+  (outline-up-heading (outline-level))
+  (hide-subtree)
+  (org-mark-ring-goto)
+  )
+
+(defun org-set-blocker ()
+  "Sets the BLOCKER property from the kill ring"
+  (interactive)
+  (org-set-property "BLOCKER" (current-kill 0))
+  (message "BLOCKER property set")
+  )
+
+(defun org-id-copy-message ()
+  "Copies the ID from an entry, but also prints a message"
+  (interactive)
+  (org-id-copy)
+  (message "ID copied to kill ring")
+  )
+
+(defun focus-on-this-buffer ()
+    "Kill all other buffers and delete all other windows."
+    (interactive)
+    (delete-other-windows)    
+    (mapc 'kill-buffer 
+          (delq (current-buffer) 
+                (remove-if-not 'buffer-file-name (buffer-list)))))
+
+(global-set-key '[(f1)] 'org-export-last)
+(global-set-key '[(f2)] 'org-preview-current)
+(global-set-key '[(f3)] 'org-preview-subtree)
+(global-set-key '[(f4)] 'org-pretty)
+(global-set-key '[(f5)] 'org-inline-images)
+(global-set-key [\C-kp-enter] 'org-update)
+(global-set-key [\M-kp-enter] 'org-open-at-point)
+(global-set-key '[(f9)] 'org-indent-code-block)
+(global-set-key (kbd "M-]") 'autocomplete)
+(global-set-key (kbd "<M-pause>") 'expand)
+;; Navigation
+(global-set-key (kbd "C-.") 'org-goto-current-stage)
+(global-set-key (kbd "C->") 'org-goto-current-article)
+(global-set-key (kbd "C-?") 'org-open-current-article)
+(global-set-key (kbd "C-`") 'org-goto-next-bookmark)
+(global-set-key (kbd "C-~") 'org-goto-previous-bookmark)
+(global-set-key (kbd "C-c n") 'org-goto-next-task)
+(global-set-key (kbd "C-c i c") 'org-id-copy-message)
+(global-set-key (kbd "C-c i g") 'org-id-get-create)
+(global-set-key (kbd "C-c d b") 'org-set-blocker)
+(global-set-key (kbd "C-;") 'org-agenda-subtree-todo)
+(global-set-key (kbd "C-c v d") 'ediff-revision)
+(global-set-key (kbd "C-c f") 'focus-on-this-buffer)
+#+end_src
+** Jumping to heading
+:PROPERTIES:
+:ID:       29168149-bece-408f-a817-8de866990ffa
+:END:
+This replaces the org-goto interface in order to jump to different headings
+#+begin_src emacs-lisp
+(setq org-goto-interface 'outline-path-completion
+      org-goto-max-level 10)
+#+end_src
+*** Taken from
+[[http://stackoverflow.com/a/15015212/1346426][is there an Emacs org-mode command to jump to an org heading?'s answer]]
+** Refiling
+:PROPERTIES:
+:ID:       5eb07f0f-9ea8-41c7-ad17-2162f0a31baa
+:END:
+[[https://lists.gnu.org/archive/html/emacs-orgmode/2011-10/msg00440.html][Re: (O) org-refile-use-outline-path question]] has a good discussion over the matter.
+This makes refiling like file path completion
+#+begin_src emacs-lisp
+(setq org-refile-use-outline-path t)
+(setq org-refile-targets (quote ((nil :maxlevel . 9))))
+#+end_src
+** Templates
+:PROPERTIES:
+:ID:       bb5aea41-80cb-4b9d-af02-95ea5e7f9b1a
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("h" "#+header: ?"))
+(add-to-list 'org-structure-template-alist '("t" "#+begin_theorem\n?\n#+end_theorem"))
+(add-to-list 'org-structure-template-alist '("p" "#+begin_proof\n?\n#+end_proof"))
+(add-to-list 'org-structure-template-alist '("q" "#+begin_quote\n?\n#+end_quote"))
+(add-to-list 'org-structure-template-alist '("lh" "#+latex_header: ?"))
+(add-to-list 'org-structure-template-alist '("l" "#+latex: ?"))
+(add-to-list 'org-structure-template-alist '("lb" "#+begin_latex\n?\n#+end_latex"))
+(add-to-list 'org-structure-template-alist '("la" "#+attr_latex: ?"))
+(add-to-list 'org-structure-template-alist '("lao" "#+attr_latex: :options [?]"))
+(add-to-list 'org-structure-template-alist '("lc" "#+latex_class: ?"))
+(add-to-list 'org-structure-template-alist '("lco" "#+latex_class_options: [?]"))
+(add-to-list 'org-structure-template-alist '("n" "#+name: ?"))
+(add-to-list 'org-structure-template-alist '("c" "#+call: ?"))
+(add-to-list 'org-structure-template-alist '("cm" "#+begin_comment\n?\n#+end_comment"))
+(add-to-list 'org-structure-template-alist '("e" "#+begin_example\n?\n#+end_example"))
+(add-to-list 'org-structure-template-alist '("lb" "#+beamer: ?"))
+(add-to-list 'org-structure-template-alist '("bb" "#+begin_beamer\n?\n#+end_beamer"))
+(add-to-list 'org-structure-template-alist '("ba" "#+attr_beamer: ?"))
+#+end_src
+*** Drawers
+:PROPERTIES:
+:ID:       3b48653a-57d5-4d5f-afcd-752a8a509e4f
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("dt" ":todo:\n?\n:end:"))
+(add-to-list 'org-structure-template-alist '("de" ":emails:\n?\n:end:"))
+(add-to-list 'org-structure-template-alist '("de" ":links:\n?\n:end:"))
+#+end_src
+*** Special tables
+:PROPERTIES:
+:ID:       0eb0bfbc-cac3-4759-92bb-0c73bfa6ba16
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("vt" ":video:\n| link | status |\n|------+--------|\n| ?     |        |\n:end:"))
+(add-to-list 'org-structure-template-alist '("lt" "| Link | Status | Description | Comment |\n|------+--------+-------------+---------|\n|      |        |             |         |\n"))
+#+end_src
+*** Source blocks
+:PROPERTIES:
+:ID:       2d935089-aa6f-4185-b60f-97013928971b
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("els" "#+begin_src emacs-lisp\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ls" "#+begin_src latex\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lscen" "#+name: ?\n#+begin_src latex :exports none\n\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lsc" "#+name: ?\n#+begin_src latex\n\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lr" "#+begin_src latex :noweb yes\n<<?>>\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lri" "src_latex[:noweb yes :exports results :results raw]{<<?>>}"))
+(add-to-list 'org-structure-template-alist '("shs" "#+begin_src sh\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("shsc" "#+name: ?\n#+begin_src sh\n\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("hss" "#+begin_src haskell\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("hssc" "#+name: ?\n#+begin_src haskell :exports none\n\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("hs" "#+begin_src html\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("os" "#+begin_src org\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ps" "#+begin_src python\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("xs" "#+begin_src xml\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("js" "#+begin_src java\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ln" "#+begin_src latex\n\\begin{anfxnote*}{}{?}\n\n\\end{anfxnote*}\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ltd" "#+begin_src latex\n\\begin{anfxnote*}{}{TODO: }\n?\n\\end{anfxnote*}\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lqt" "#+begin_src latex\n\\begin{anfxnote*}{}{Tal: }\n?\n\\end{anfxnote*}\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("lqy" "#+begin_src latex\n\\begin{anfxnote*}{}{Yossi: }\n?\n\\end{anfxnote*}\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("scs" "#+begin_src scala\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ocs" "#+begin_src objc\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("octs" "#+begin_src octave\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ns" "#+begin_src nix\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("as" "#+begin_src ahk\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("gs" "#+begin_src groovy\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("sws" "#+begin_src swift\n?\n#+end_src"))
+(add-to-list 'org-structure-template-alist '("ms" "#+begin_src maxima\n?\n#+end_src"))
+#+end_src
+*** Latex
+:PROPERTIES:
+:ID:       1fb3aee4-e7d9-4e3d-b8c1-cd9cc5beeb94
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("lee" "\\begin{equation}\n?\n\\end{equation}"))
+(add-to-list 'org-structure-template-alist '("leeu" "\\begin{equation*}\n?\n\\end{equation*}"))
+(add-to-list 'org-structure-template-alist '("lea" "\\begin{align}\n?\n\\end{align}"))
+(add-to-list 'org-structure-template-alist '("leau" "\\begin{align*}\n?\n\\end{align*}"))
+(add-to-list 'org-structure-template-alist '("lqc" ":source_table:\n#+name: ?\n:end:\n#+begin_src latex :noweb yes\n\\inlineQcircuit{\n  <<org-table-to-latex-matrix()>>\n}\n#+end_src"))
+#+end_src
+*** Links
+:PROPERTIES:
+:ID:       073cea13-3b0a-4b9c-9f11-41150d86c3a1
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("b" "<<bookmark>>"))
+(add-to-list 'org-structure-template-alist '("cs" "<<current-stage>>"))
+(add-to-list 'org-structure-template-alist '("ca" "<<current-article>>"))
+#+end_src
+*** Android
+:PROPERTIES:
+:ID:       11eb9180-936a-4f1d-8128-33bb854e6d98
+:END:
+#+begin_src emacs-lisp
+(add-to-list 'org-structure-template-alist '("apv" "****** Git revision\n#+begin_example\n?\n#+end_example\n****** apks"))
+#+end_src
+** Functions
+*** Torah
+**** Open Gemarah
+:PROPERTIES:
+:ID:       0ea02683-8411-477f-9203-7de9c3a69ffc
+:END:
+#+begin_src emacs-lisp
+(defun open_gemara (masechet page)
+  (call-process "evince" nil 0 0 "-p" (number-to-string page) (concat "/home/amitai/gemara/" masechet ".pdf"))
+  )
+#+end_src
+**** Review Lesson
+:PROPERTIES:
+:ID:       a5c2f896-f232-4e5f-bf00-a8725c3f16dc
+:END:
+#+begin_src emacs-lisp
+(defun review_lesson (file)
+(let ((default-directory "/home/amitai/data1/Torah Lessons/bar_ilan_recordings/"))
+  (call-process "vlc" nil 0 0 file))
+)
+#+end_src
+
+** Time Zone
+:PROPERTIES:
+:ID:       2b06f8bb-19a1-4ddf-b217-31059010f0bc
+:END:
+
+#+begin_src emacs-lisp
+(setenv "TZ" "UTC-3")
+#+end_src
+** Export
+*** Task Juggler
+:PROPERTIES:
+:ID:       99ce3d66-993f-45d5-8f40-7a7c01b66259
+:END:
+#+begin_src emacs-lisp
+(require 'ox-taskjuggler)
+#+end_src
+** Publishing
+:PROPERTIES:
+:ID:       9a29a456-03ab-47f3-aa45-cdcf65d842d2
+:END:
+#+begin_src emacs-lisp
+(setq org-publish-project-alist
+      '(("shell-scripts"
+	 :base-directory "~/org-mode/private/literate-programming/shell-scripts"
+	 :base-extension "org"
+	 :publishing-directory "~/scripts/"
+	 :publishing-function org-babel-tangle-publish
+	 :recursive t
+	 )))
+#+end_src
+* Latex
+:PROPERTIES:
+:ID:       ecb1a6f8-5870-42b1-8a62-89ce7a4d274f
+:END:
+#+begin_src emacs-lisp
+(setq LaTeX-indent-level 4)
+;(setq LaTeX-item-indent 0)
+
+;; Default LaTeX export packages
+;(add-to-list 'org-latex-packages-alist '("" "amsthm,caption,subcaption,multirow,bigdelim,titlesec,tikz"))
+
+;; For the preview
+(add-to-list 'org-latex-packages-alist '("" "amsmath" t))
+
+;; For tikz preview
+;(setq org-latex-packages-alist '(("" "tikz" t)))
+;(eval-after-load "preview"
+;    '(add-to-list 'preview-default-preamble "\\PreviewEnvironment{tikzpicture}" t))
+(setq org-latex-create-formula-image-program 'imagemagick)
+
+(setq org-latex-default-packages-alist (quote ("\\tolerance=1000")))
+
+;; Controlling LaTeX preview
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.8))
+
+;; Set environment variables for Haskell Diagrams
+(setenv "PATH" (concat "/home/amitai/.cabal/bin:" (getenv "PATH")))
+(setenv "NIX_GHC" (shell-command-to-string "type -p ghc"))
+(let* ((command (concat "grep export " (getenv "NIX_GHC")))
+       (output (shell-command-to-string command))
+       (lines (split-string output "\n")))
+  (dolist (line lines) (let* ((assignment (nth 1 (split-string line " "))))
+                         (if assignment
+                             (let ((assignment_parts (split-string assignment "=")))
+                               (setenv (nth 0 assignment_parts) (nth 1 assignment_parts)))))))
+
+(setenv "PDFLATEX" "pdflatex --shell-escape")
+
+;; Set environment variables for the open_gemara shell script
+(setenv "PATH" (concat "/home/amitai/scripts/org_mode:" (getenv "PATH")))
+(shell-command "alias og='open_gemara.sh'")
+
+;; May slow down autocompletion
+;(setq shell-file-name "bash")
+;(setq shell-command-switch "-ic")
+
+;; Fix BibTex bug
+;(setq org-latex-pdf-process (quote ("PATH=\"/home/amitai/.cabal/bin\":$PATH PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p -b -V %f")))
+(setq org-latex-pdf-process (quote ("texi2dvi -p -b -V %f")))
+
+;; AUCTeX
+;; Compile documents to PDF by default
+(setq TeX-PDF-mode t)
+#+end_src
+* Safe variables
+:PROPERTIES:
+:ID:       df380c53-a260-4a42-83dd-a5eb9e44f84f
+:END:
+#+begin_src emacs-lisp
+(setq safe-local-variable-values (quote ((eval load "qc.el") (eval load "sw.el") (eval load "hebrew.el"))))
+#+end_src
+* Unsorted
+:PROPERTIES:
+:ID:       51aafe75-f09f-4b66-bdc9-ebaa5292b522
+:END:
+#+begin_src emacs-lisp
+;; This is for odt and texinfo export
+(require 'ox-odt)
+;(require 'ox-texinfo)
+(require 'ox-beamer)
+
+(defun on-kde ()
+  (if (getenv "KDE_FULL_SESSION")
+      'true
+    'false))
+
+(defun gnome-open-file (filename)
+  "gnome-opens the specified file."
+  (interactive "fFile to open: ")
+  (let* ((process-connection-type nil)
+         (open-command (if (on-kde) "kde-open" "/usr/bin/gnome-open")))
+    (start-process "" nil open-command filename)))
+
+(defun dired-gnome-open-file ()
+  "Opens the current file in a Dired buffer."
+  (interactive)
+  (gnome-open-file (dired-get-file-for-visit)))
+
+(add-hook 'dired-mode-hook (lambda () (local-set-key "E" 'dired-gnome-open-file)))
+
+(defun dired-open-file-explorer ()
+  (interactive)
+  (let ((file-explorer-name (if (on-kde) "dolphin" "nautilus")))
+    (call-process file-explorer-name nil 0 nil (dired-current-directory))))
+
+(add-hook 'dired-mode-hook (lambda () (local-set-key "e" 'dired-open-nautilus)))
+
+;; For making Special Symbols rendering
+;(setq org-pretty-entities t)
+
+;; The following cancels org mode overriding paragraph direction
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq bidi-paragraph-direction nil)))
+
+;; Open Emacs with only one screen
+;;(add-hook 'emacs-startup-hook
+;;          (lambda () (delete-other-windows)) t)
+
+;; Prevents emacs from splitting screens
+;;(add-hook 'window-setup-hook 'delete-other-windows)
+
+;; Stop emacs from saving backup files
+(setq make-backup-files nil)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(bidi-paragraph-direction nil)
+ '(global-visual-line-mode t)
+ '(haskell-mode-hook (quote (turn-on-haskell-indent turn-on-haskell-indentation turn-on-haskell-simple-indent)) t)
+ '(inhibit-startup-screen t)
+ '(initial-frame-alist (quote ((fullscreen . maximized))))
+ '(org-agenda-files (quote ("~/org-mode/qc.org" "~/org-mode/hebrew.org" "~/org-mode/sw.org"))))
+#+end_src
+* Keybindings
+** Repeat last command
+:PROPERTIES:
+:ID:       a7b834a5-7477-49ff-a433-0bdc1e2cbf9c
+:END:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c r") (lambda () (interactive) (repeat-complex-command 1)))
+#+end_src
+** Find a function
+:PROPERTIES:
+:ID:       f9476eee-1378-4504-b1c9-99c5da8c0c2f
+:END:
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-h C-f") 'find-function)
+#+end_src
