@@ -1,0 +1,41 @@
+* ~.gitignore~ files
+:PROPERTIES:
+:ID:       58354ec4-e8c3-43d2-bb8c-edf3c2bcf21b
+:END:
+** Pods or Carthage folders as submodule
+Taken from [[https://stackoverflow.com/questions/18939421/what-should-xcode-6-gitignore-file-include/18939465#18939465][ios - What should Xcode 6 gitignore file include? - Stack Overflow's answer]]
+#+begin_src sh conf
+# Xcode
+.DS_Store
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+*.xcworkspace
+!default.xcworkspace
+xcuserdata
+profile
+*.moved-aside
+DerivedData
+.idea/
+#+end_src
+** Ignoring all files but ~.org~ files
+:PROPERTIES:
+:ID:       51f7421f-b70e-4fc2-8e09-a65aa34df13a
+:END:
+Taken from [[http://stackoverflow.com/a/8025106/1346426][.gitignore ignore all files then recursively allow *.foo's answer]].
+
+#+begin_src conf :tangle ~/org-mode/literate-programming/.gitignore :tangle ~/org-mode/private/literate-programming/.gitignore
+# Ignore everything
+*
+# Don't ignore directories, so we can recurse into them
+!**/
+# Don't ignore .gitignore and *.org files
+# !.gitignore
+!*.org
+#+end_src

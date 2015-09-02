@@ -102,7 +102,7 @@
 :PROPERTIES:
 :ID:       9a2670f6-2e9e-48c5-bed4-8be229414af0
 :END:
-#+begin_src nix :noweb yes :tangle ~/org-mode/nixos/toshiba-pkgs.nix
+#+begin_src nix :noweb yes :tangle toshiba-pkgs.nix
 with import <nixpkgs> {}; [ 
     <<haskell>>
     <<latex>>
@@ -113,14 +113,19 @@ with import <nixpkgs> {}; [
 :PROPERTIES:
 :ID:       15682c74-afc4-45cb-9f3f-0cb2bf3d70c7
 :END:
-#+begin_src nix :noweb yes :tangle ~/org-mode/nixos/mini-mac-pkgs.nix
+#+begin_src nix :noweb yes :tangle mini-mac-pkgs.nix
 with import <nixpkgs> {}; [ 
     #dropbox
     #synergy
-    emacs
+    #emacs
+    keepassx
+    unison
 ]
 #+end_src
 ** Packages
+:PROPERTIES:
+:ID:       1412ee13-ec78-44a0-8fba-a73e2e4254a8
+:END:
 *** Libraries
 
 #+name: libraries
@@ -174,6 +179,7 @@ nix-repl
 #+begin_src nix
 #commonsCompress
 #dvdisaster
+pandoc
 synergy
 keepassx
 kde4.kmymoney
@@ -273,6 +279,7 @@ tcl
 #+begin_src nix
 emacs
 idea.android-studio
+atom
 #+end_src
 **** Source Control
 :PROPERTIES:
@@ -296,6 +303,7 @@ dropbox
 aria
 youtube-dl
 telegram-cli
+unison
 #+end_src
 *** Math
 :PROPERTIES:
@@ -314,6 +322,7 @@ maxima
 
 #+name: system-tools
 #+begin_src nix
+unrar
 zsh
 kde4.filelight
 unetbootin
@@ -455,6 +464,7 @@ ne = "nix-env -f ~/nixpkgs/";
 fpo = "stat -c \"%a %n\"";
 gs = "git status";
 gd = "git diff";
+gdxd = "git diff --diff-filter=M";
 orgmode-update = "git pull && make clean && make && make doc";
 odt2org = "python ~/applications/odt2org/odt2org.py";
 og = "open_gemara.sh";

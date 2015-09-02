@@ -18,6 +18,8 @@
 ;; Adding per file elisp settings
 (add-to-list 'load-path "~/org-mode/elisp")
 (add-to-list 'load-path "~/lib/elisp")
+(let ((default-directory "~/lib/elisp"))
+  (normal-top-level-add-subdirs-to-load-path))
 #+end_src
 ** NixOS
 :PROPERTIES:
@@ -153,6 +155,13 @@ Meanwhile ahk-mode doesn't work, so I'm using xahk-mode instead
 #+begin_src emacs-lisp
 (require 'nix-mode)
 #+end_src
+*** TaskJuggler Mode
+:PROPERTIES:
+:ID:       12be75d7-0ad0-4fca-aeff-b3bd77fe230b
+:END:
+#+begin_src emacs-lisp
+(require 'taskjuggler-mode)
+#+end_src
 ** Polymode
 :PROPERTIES:
 :ID:       ff981f9f-f0d6-4634-b639-7dde7a11af76
@@ -215,9 +224,9 @@ Polymode [[id:11e4e284-733a-428c-bf60-2da04127568d][Jumps and closes all entries
 :END:
 #+begin_src emacs-lisp
 ;; The following lines are for getting org-mode from the development version
-(setq load-path (cons "~/dev/github/reps/org-mode/lisp" load-path))
-(setq load-path (cons "~/dev/github/reps/org-mode/contrib/lisp"
-                      load-path))
+;(setq load-path (cons "~/dev/github/reps/org-mode/lisp" load-path))
+;(setq load-path (cons "~/dev/github/reps/org-mode/contrib/lisp"
+;                      load-path))
 
 (require 'org-install)
 #+end_src
@@ -814,6 +823,25 @@ This is a key binding to perform the tangle of a haskell block and display the i
 		   (org-make-org-heading-search-string
 		    (buffer-substring (point-at-bol) (point-at-eol)))))))))
 #+end_src
+*** org-id
+:PROPERTIES:
+:ID:       bdb88f58-6f45-464d-b14b-24ab8e9c5430
+:END:
+
+#+name: org-rep-dirs
+| ~/org-mode                      |
+| ~/org-mode/wikis                |
+| ~/org-mode/literate-programming |
+| ~/dqc1                          |
+
+#+begin_src emacs-lisp :noweb yes
+(require 'org-id)
+(setq org-id-files '(<<list-revisioned-org-files()>>))
+#+end_src
+This is for generation of uniqe ID when storing a link
+#+begin_src emacs-lisp
+(setq org-link-to-org-use-id t)
+#+end_src
 *** Misc
 :PROPERTIES:
 :ID:       837e9fe2-4f5f-469a-9873-147c9fadd534
@@ -825,11 +853,7 @@ This is a key binding to perform the tangle of a haskell block and display the i
 ;; Enable property inheritance
 (setq org-use-property-inheritance t)
 
-;; This is for generation of uniqe ID when storing a link
-(setq org-link-to-org-use-id t)
-
 ;; The following lines are always needed.  Choose your own keys.
-(require 'org-id)
 (add-hook 'org-mode-hook 'turn-on-font-lock) ; not needed when global-font-lock-mode is on
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -1145,6 +1169,14 @@ This makes refiling like file path completion
 #+begin_src emacs-lisp
 (require 'ox-taskjuggler)
 #+end_src
+***** TaskJuggler 3
+:PROPERTIES:
+:ID:       65df003a-034d-44f3-8c71-2232dd07ea58
+:END:
+Meanwhile not working
+#+begin_src emacs-lisp
+;;(require 'org-taskjuggler3)
+#+end_src
 *** Publishing
 :PROPERTIES:
 :ID:       9a29a456-03ab-47f3-aa45-cdcf65d842d2
@@ -1226,6 +1258,15 @@ This makes refiling like file path completion
 :END:
 #+begin_src emacs-lisp
 ;(require 'org-screen)
+#+end_src
+*** Outshine
+:PROPERTIES:
+:ID:       6ddeee66-f426-4795-b990-b662dc5e942e
+:END:
+#+begin_src emacs-lisp
+(require 'outshine)
+(add-hook 'outline-minor-mode-hook 'outshine-hook-function)
+(add-hook 'swift-mode-hook 'outline-minor-mode)
 #+end_src
 ** Latex
 :PROPERTIES:

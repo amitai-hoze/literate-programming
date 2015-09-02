@@ -1,0 +1,8 @@
+#+PROPERTY: header-args :shebang "#!/bin/sh"
+
+* Mac shell script files
+This [[http://regexr.com/3bm1t][regexp]] is working, but can't make it to work on mac.
+
+#+begin_src sh
+sw_vers | grep ProductVersion | sed 's/.*?:\t([0-9]{1,2})\.\([0-9]{1,2}\)\.[0-9]/\1/'
+#+end_src
