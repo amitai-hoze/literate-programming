@@ -720,8 +720,7 @@ This is a key binding to perform the tangle of a haskell block and display the i
 #+begin_src emacs-lisp
 (defun org-babel-setup ()
   (if (and (stringp (buffer-file-name)) (not (string/ends-with (buffer-file-name) "babel-lib.org")))
-      (org-babel-lob-ingest "/home/amitai/org-mode/babel-lib.org")))
-  ;;(org-babel-lob-ingest "/home/amitai/build/emacs/org-mode/doc/library-of-babel.org")
+      (org-babel-lob-ingest "~/org-mode/literate-programming/babel/babel-lib.org")))
 
 (add-hook 'org-mode-hook 'org-babel-setup)
 #+end_src

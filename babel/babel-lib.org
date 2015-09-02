@@ -1,0 +1,198 @@
+#+name: clear-table-errors
+#+begin_src emacs-lisp :results silent
+(replace-regexp "#ERROR" "")
+(org-ctrl-c-ctrl-c)
+#+end_src
+* Examples
+** Tables
+#+name: fib-s-1
+| a |   |   |   |   |
+|   | b |   |   |   |
+|   |   | c |   | d |
+|   |   |   | a |   |
+|   |   | d |   | e |
+
+#+name: fib-i-1
+| *pp |
+| *p* |
+| p*p |
+| pp* |
+| ppp |
+* Haskell
+** Diagrams
+#+name: imports
+#+begin_src haskell :exports none
+{-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeFamilies #-}
+import Diagrams.Prelude
+--import Diagrams.Backend.SVG.CmdLine
+import Data.List
+import Data.Colour.SRGB
+import Diagrams.TrailLike
+import Diagrams.TwoD.Arrow
+import Diagrams.TwoD.Arrowheads
+import Diagrams.TwoD.Arc
+import Diagrams.TwoD.Path.Metafont
+#+end_src
+
+#+name: beside-operators
+#+begin_src haskell :exports none
+-- (-/) :: (Juxtaposable a, Semigroup a, R2 (V a)) => a -> a -> a
+(-/) t1 t2 = (beside (r2 (1,1)) t1 t2)
+(\-) t1 t2 = (beside (r2 (-1,1)) t1 t2)
+(-->) t1 t2 = (beside (r2 (1,0)) t1 t2)
+(<--) t1 t2 = (beside (r2 (-1,0)) t1 t2)
+(-^-) t1 t2 = (beside (r2 (0,1)) t1 t2)
+(-.-) t1 t2 = (beside (r2 (0,-1)) t1 t2)
+#+end_src
+** Maxima
+*** Noweb source block
+#+name: mat2tex
+#+begin_src haskell :var argsStr="maxima-eval:eval#x:x:2"
+import Shelly.Pipe
+import Data.Text as T
+import Data.List as L
+
+let splitColon = T.splitOn # ":"
+let splitHash = T.splitOn # "#"
+let (##) f text = f (fromText # text)
+let (.#) f strs = (f (L.map T.pack strs))
+let (#) f str = (f (T.pack str))
+let workingDirCd = cd ## "/home/amitai/org-mode/haskell"
+let [optionListText,expressionListText] = splitHash # argsStr
+let (optionList, expressionList) = (splitColon optionListText,splitColon expressionListText)
+let runhaskell_ args = run_ ## "runhaskell" $ args
+let args = [T.pack "mat2tex.hs"] ++ optionList ++ expressionList
+shs $ do { workingDirCd; runhaskell_ args }
+#+end_src
+
+*** Modules
+**** OrgMode.Babel
+:PROPERTIES:
+:ID:       b8409282-d588-4528-a173-997be953660b
+:END:
+
+#+begin_src haskell :tangle haskell/OrgMode/Babel.hs
+module OrgMode.Babel
+( maximaNowebReference
+) where
+
+nowebCall src_block expression =
+                "<<" ++ src_block ++ "(\"\\\"" ++ expression ++ "\\\"\")>>"
+
+maximaEvCommand expression evalExpression value =
+  "ev(" ++ expression ++ ", " ++ evalExpression ++ "=" ++ value ++ ")"
+
+maximaNowebReference src_block command expressionList
+  | length expressionList == 1 =
+           case command of "simple" -> nowebCallSrc expression
+  | length expressionList >= 3 =
+           let (evalExpression:value:tail) = expressionListTail
+               eval = maximaEvCommand expression evalExpression value
+           in case command of "eval"     -> nowebCallSrc eval
+                              "showEval" -> (nowebCallSrc expression) ++ " = " ++ (nowebCallSrc eval)
+  | otherwise = ""
+  where nowebCallSrc = nowebCall src_block
+        (expression:expressionListTail) = expressionList
+#+end_src
+*** Executables
+:PROPERTIES:
+:ID:       8b27d4e1-503a-4bf1-ac06-e71aed7e9768
+:END:
+#+begin_src haskell :tangle haskell/mat2tex.hs
+import OrgMode.Babel
+import System.Environment
+
+main :: IO ()
+main = do
+     --let latexEnv env latex = "\begin{" ++ env ++ "}\n" ++ latex ++ "\n\end{" ++ env ++ "}"
+     --let latexEnv' = latexEnv "equation"
+     args <- getArgs
+     let (blockName:command:expressionList) = args
+     putStrLn (maximaNowebReference blockName command expressionList)
+#+end_src
+*** Maxima simple block
+#+name: maxima-eval
+#+begin_src maxima :noweb yes :var eval="x" :results output :exports none
+programmode: false;      
+?princ(tex1(eval_string(eval)))$
+#+end_src
+* Emacs lisp
+** Making all cells in a table typeset in math with constant spacing
+#+name: latex-math-constant-spacing
+#+begin_src emacs-lisp :var table=fib-i-2 :results raw
+(defun ensure-math(exp)
+  (format "\\ensuremath{%c}" exp))
+
+(defun latex-math-constant-spacing(exp)
+  (format "\\text{%s}" (mapconcat 'ensure-math exp "")))
+
+(defun latex-math-constant-spacing-table (table)
+  (mapcar (lambda (l) (mapcar 'latex-math-constant-spacing l)) table))
+
+(latex-math-constant-spacing-table table)
+#+end_src
+** org-mode table to matrix
+#+name: org-table-to-latex-matrix
+#+begin_src emacs-lisp :var table='((:head) hline (:body))
+(require 'cl)
+(flet ((to-tab (tab)
+               (orgtbl-to-generic
+                (mapcar (lambda (lis)
+                          (if (listp lis)
+                              (mapcar (lambda (el)
+                                        (if (stringp el)
+                                            el
+                                          (format "%S" el))) lis)
+                            lis)) tab)
+                (list :lend " \\\\" :sep " & " :hline "\\hline"))))
+  (org-fill-template
+   "%table"
+   (list
+    (cons "table"
+          ;; only use \midrule if it looks like there are column headers
+          (if (equal 'hline (second table))
+              (concat (to-tab (list (first table)))
+                      "\n\\midrule\n"
+                      (to-tab (cddr table)))
+            (to-tab table))))))
+#+end_src
+* Latex
+** Matrices
+#+name: pmatrix-math-constant-spacing
+#+begin_src latex :noweb yes
+\begin{pmatrix}
+  <<org-table-to-latex-matrix(table=latex-math-constant-spacing[:results table](table))>>
+\end{pmatrix}
+#+end_src
+
+#+name: pmatrix
+#+begin_src haskell :var table=fib-s-1 :results output latex
+{-# LANGUAGE OverloadedStrings #-}
+import Text.LaTeX
+import Text.LaTeX.Base.Pretty
+import Text.LaTeX.Packages.AMSMath
+import Data.Matrix
+
+table :: [[Text]]
+
+main :: IO ()
+main = putStrLn (execLaTeXT matrices >>= prettyLaTeX)
+
+matrices :: Monad m => LaTeXT_ m
+matrices = do pmatrix Nothing $ (fromLists table)
+#+end_src
+* Shell
+
+#+name: list-revisioned-org-files
+#+begin_src sh :var rep_dirs=org-rep-dirs :results output
+for dir in $rep_dirs; do
+    eval "cd $dir"
+
+    for file in `git ls-files | grep -E "*.org$"`; do
+        echo -n "\"$dir/$file\" "
+    done
+done
+#+end_src
+
