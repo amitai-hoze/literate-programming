@@ -29,6 +29,14 @@
 (require 'tramp) 
 (add-to-list 'tramp-remote-path "/run/current-system/sw/bin")
 #+end_src
+** Guix
+:PROPERTIES:
+:ID:       a4a7ebe2-6868-45b3-84b8-bcbe9ac13574
+:END:
+#+begin_src emacs-lisp
+(setq guix-load-path "/home/amitai/.guix-profile/share/emacs/site-lisp")
+(require 'guix-init nil t)
+#+end_src
 ** Debugging
 :PROPERTIES:
 :ID:       82f210d5-3d25-4b71-bc5b-c22050c66393
@@ -404,8 +412,8 @@ The ~org-meta-visible-color~ and ~org-special-visible-color~ are created by taki
 (defvar org-meta-visible-color org-level-4-color)
 (defvar org-meta-invisible-color "#EEC8EA")
 ;; Temporary hack to allow readable mode
-(global-set-key (kbd "C-c w") (lambda () (interactive) (setq org-meta-invisible-color "#FFFFFF")))
-(global-set-key (kbd "C-c o") (lambda () (interactive) (setq org-meta-invisible-color "#EEC8EA")))
+(global-set-key (kbd "C-c w w") (lambda () (interactive) (setq org-meta-invisible-color "#FFFFFF")))
+(global-set-key (kbd "C-c w o") (lambda () (interactive) (setq org-meta-invisible-color "#EEC8EA")))
 
 (defvar org-meta-invisible-color "#FFFFFF")
 (defvar org-special-visible-color org-level-3-color)
@@ -1177,6 +1185,7 @@ Meanwhile not working
 ;;(require 'org-taskjuggler3)
 #+end_src
 *** Publishing
+**** Projects
 :PROPERTIES:
 :ID:       9a29a456-03ab-47f3-aa45-cdcf65d842d2
 :END:
@@ -1224,6 +1233,13 @@ Meanwhile not working
          :publishing-function org-babel-tangle-publish
          :recursive t
          )
+        ("synergy"
+         :base-directory "~/org-mode/private/literate-programming/conf/synergy"
+         :base-extension "org"
+         :publishing-directory "~/conf/synergy"
+         :publishing-function org-babel-tangle-publish
+         :recursive t
+         )
         ("dot-files"
          :base-directory "~/org-mode/literate-programming/dot-files"
          :base-extension "org"
@@ -1231,6 +1247,21 @@ Meanwhile not working
          :publishing-function org-babel-tangle-publish
          :recursive t
          )))
+#+end_src
+**** Blog
+:PROPERTIES:
+:ID:       2cb976a8-6ce6-4c26-a443-9812124c86a0
+:END:
+#+begin_src emacs-lisp
+(require 'org2blog-autoloads)
+(setq org2blog/wp-blog-alist
+      '(("personal"
+         :url "http://amitaihoze.wordpress.com/xmlrpc.php"
+         :username "amitai.hoze@gmail.com"
+         :password "h14416624826"
+         :default-title "הגיגי"
+         :default-categories ("יהדות")
+         :tags-as-categories nil)))
 #+end_src
 *** contrib
 **** org-eww
@@ -1248,7 +1279,7 @@ Meanwhile not working
 (require 'org-index)
 (setq org-index-id "026fdb40-2889-40c6-8e04-3dec2543d673")
 
-(global-set-key (kbd "C-s-i") (lambda () (interactive) (org-index)))
+(global-set-key (kbd "C-c o") (lambda () (interactive) (org-index)))
 (global-set-key (kbd "C-s-o") (lambda () (interactive) (org-index 'occur)))
 #+end_src
 **** org-screen
