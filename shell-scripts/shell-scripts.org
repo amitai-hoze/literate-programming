@@ -113,6 +113,7 @@ done
 :ID:       8b76af3c-db4d-40cb-acb8-370a7027aec3
 :END:
 #+begin_src sh :tangle git-update-fork.sh
+git remote add upstream https://github.com/NixOS/nixpkgs.git
 git fetch upstream
 git checkout master
 git merge upstream/master
@@ -233,7 +234,7 @@ sudo usb_modeswitch -v 19d2 -p 0154 -V 19d2 -P 0117 -M "555342431234567800000000
 :ID:       baefd0f4-c9ad-4555-9985-a9d2a7b1ab11
 :END:
 #+begin_src sh :tangle nix-install-pkgs.sh
-nix-env -f ~/nixpkgs -i -f pkgs.nix
+nix-env -f ~/nixpkgs -i -f ~/pkgs.nix
 #+end_src
 ** Text
 *** Compare if files have the same lines
@@ -259,4 +260,12 @@ for file in `cat $1 | grep "file" | cut -f2 -d">" | cut -f1 -d"<"`; do
     i=$((i+1))
     cp $file ubuntu_backgrounds/$i.jpg
 done
+#+end_src
+** Audio
+*** Get modified date for ~mid3v2~
+:PROPERTIES:
+:ID:       ff557f0b-e7d9-4ebf-ab5d-61b1c7440a9a
+:END:
+#+begin_src sh :tangle get-modified.sh
+stat "$1" | grep Modify | cut -f2 -d" "
 #+end_src

@@ -115,6 +115,9 @@
         ];
 
         boot = {
+            extraModprobeConfig = ''
+            options snd slots=snd-hda-intel
+            '';
             loader.grub = {
                 enable = true;
                 version = 2;
@@ -124,15 +127,10 @@
             };
         };
 
-        #networking = {
-            #hostName = "lenovo-laptop-nixos";
-            #interfaceMonitor.enable = false;
-            #wireless.enable = false;
-            #networkmanager.enable = true;
-            #networkmanager.packages = [ pkgs.networkmanagerapplet ];
-            #useDHCP = false;
-            #wicd.enable = true;
-        #};
+        networking = {
+            hostName = "lenovo-laptop-nixos";
+            wireless.enable = true;
+        };
 
         swapDevices = [
             {
@@ -146,12 +144,12 @@
             
             xserver = {
                 enable = true;
-                displayManager.kdm.enable = true;
-                desktopManager.kde4.enable = true;
-                #windowManager.xmonad.enable = true;
-                #windowManager.default = "xmonad";
-                #desktopManager.xterm.enable = false;
-                #desktopManager.default = "none";
+                #displayManager.kdm.enable = true;
+                #desktopManager.kde4.enable = true;
+                windowManager.xmonad.enable = true;
+                windowManager.default = "xmonad";
+                desktopManager.xterm.enable = false;
+                desktopManager.default = "none";
             };
         };
 
@@ -167,25 +165,26 @@
 
         environment = {
             systemPackages = with pkgs; [
-                #<<libraries>>
-                #<<games>>
-                #<<command-line-tools>>
-                #<<nix-tools>>
-                #<<misc>>
-                #<<media-players-viewers>>
-                #<<media-editors>>
-                #<<latex>>
-                #<<interpreters>>
-                #<<haskell>>
-                #<<java>>
+                <<libraries>>
+                <<games>>
+                <<command-line-tools>>
+                <<nix-tools>>
+                <<misc>>
+                <<media-players-viewers>>
+                <<media-editors>>
+                <<latex>>
+                <<interpreters>>
+                <<haskell>>
+                <<java>>
                 mplayer
                 <<ides>>
                 <<source-control>>
                 <<internet>>
-                #<<math>>
-                #<<system-tools>>
-                #<<ruby-gems>>
+                <<math>>
+                <<system-tools>>
+                <<ruby-gems>>
                 #kde4.<<kde4>>
+                dmenu
             ];
 
             shellAliases = {
@@ -279,11 +278,15 @@
         services = {
             acpid.enable = true;
             upower.enable = true;
-
+            
             xserver = {
                 enable = true;
-                displayManager.kdm.enable = true;
-                desktopManager.xfce.enable = true;
+                #displayManager.kdm.enable = true;
+                #desktopManager.kde4.enable = true;
+                windowManager.xmonad.enable = true;
+                windowManager.default = "xmonad";
+                desktopManager.xterm.enable = false;
+                desktopManager.default = "none";
             };
         };
 
@@ -305,10 +308,18 @@
 #+name: ubuntu
 #+begin_src nix
 <<source-control>>
+emacs
+kde4.kmymoney
+aria
+youtube-dl
 chromium
 vlc
 keepassx
 gparted
+pandoc
+xsel
+#easytag # Currently has a bug saving unicode
+python34Packages.mutagen
 #+end_src
 **** Lenovo
 :PROPERTIES:
@@ -327,6 +338,24 @@ with import <nixpkgs> {}; [
 with import <nixpkgs> {}; [ 
     <<haskell>>
     <<latex>>
+    <<ubuntu>>
+]
+#+end_src
+**** Ippon
+:PROPERTIES:
+:ID:       9076dbb4-73ed-4a17-ac00-93ba7eb1f259
+:END:
+#+begin_src nix :noweb yes :tangle ippon-pkgs.nix
+with import <nixpkgs> {}; [ 
+    <<ubuntu>>
+]
+#+end_src
+**** Asus
+:PROPERTIES:
+:ID:       1133f3e0-34ea-433e-9a86-d0e835cda0c9
+:END:
+#+begin_src nix :noweb yes :tangle asus-pkgs.nix
+with import <nixpkgs> {}; [ 
     <<ubuntu>>
 ]
 #+end_src
@@ -426,7 +455,8 @@ emacs
 
 #+name: source-control
 #+begin_src nix
-#git
+git
+git-annex
 meld
 #+end_src
 *** Games
@@ -452,7 +482,7 @@ meld
 #+begin_src nix
 networkmanager
 chromium
-dropbox
+dropbox-cli
 aria
 youtube-dl
 telegram-cli
@@ -548,7 +578,6 @@ nix-prefetch-scripts
 nix-repl
 #+end_src
 *** Ruby Gems
-<<current-stage>>
 #+name: ruby-gems
 #+begin_src nix
 #ruby
