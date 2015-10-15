@@ -8,7 +8,80 @@
 :PROPERTIES:
 :ID:       75ac1874-d700-4e66-9058-fa8753cf3e7c
 :END:
-** Asus Laptop
+
+** NixOS
+*** Asus eee
+:PROPERTIES:
+:ID:       0c800508-a040-431f-87f1-853cec936c1d
+:END:
+#+begin_src nix :noweb yes :tangle asus-eee-configuration.nix
+{ config, pkgs, ... }:
+
+{
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowBroken = true;
+    nixpkgs.config.allowTexliveBuilds = true;
+    nixpkgs.system = "x86_64-linux";
+    programs.zsh.enable = true;
+
+    imports =
+        [ # Include the results of the hardware scan.
+            /etc/nixos/hardware-configuration.nix
+        ];
+
+
+        boot.loader.grub.enable = true;
+        boot.loader.grub.version = 2;
+        # Define on which hard drive you want to install Grub.
+        boot.loader.grub.device = "/dev/sda";
+
+        networking = {
+            hostName = "asus-eee-nixos";
+            hostId = "6f8f7d5f";
+        };
+
+        # Select internationalisation properties.
+        # i18n = {
+        #   consoleFont = "lat9w-16";
+        #   consoleKeyMap = "us";
+        #   defaultLocale = "en_US.UTF-8";
+        # };
+
+        environment = {
+            systemPackages = with pkgs; [
+                <<basic>>
+                <<haskell>>
+                <<latex>>
+                <<xmonad-apps>>
+                x11vnc
+            ];
+
+            shellAliases = {
+                <<shell-aliases>>
+            };
+
+            interactiveShellInit = ''
+            <<interactive-shell-init>>
+            '';
+        };
+
+        services = {
+            <<services>>
+        };
+
+        users.defaultUserShell = "/run/current-system/sw/bin/zsh";
+        users.extraUsers.amitai = {
+            <<users>>
+        };
+
+        powerManagement = {
+            enable = true;
+            cpuFreqGovernor = "ondemand";
+        };
+
+}
+#+end_src
+*** Asus Laptop
 :PROPERTIES:
 :ID:       29b02e0a-9aa8-4d5d-8d5a-43ac7b5c1735
 :END:
@@ -59,20 +132,18 @@
 
     environment = {
         systemPackages = with pkgs; [
-            <<libraries>>
+            <<basic>>
+            <<xmonad-apps>>
             <<games>>
             <<command-line-tools>>
             <<nix-tools>>
             <<misc>>
-            <<media-players-viewers>>
             <<media-editors>>
             <<latex>>
             <<interpreters>>
             <<haskell>>
             <<java>>
             <<ides>>
-            <<source-control>>
-            <<internet>>
             <<math>>
             <<system-tools>>
             <<ruby-gems>>
@@ -96,8 +167,81 @@
     };
 }
 #+end_src
+*** Ippon Desktop
+:PROPERTIES:
+:ID:       29b02e0a-9aa8-4d5d-8d5a-43ac7b5c1735
+:END:
+#+begin_src nix :noweb yes :tangle ippon-configuration.nix
+{ pkgs, config, ... }: {
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowBroken = true;
+    nixpkgs.system = "x86_64-linux";
+    programs.zsh.enable = true;
 
-** Lenovo Laptop
+    imports =
+        [ # Include the results of the hardware scan.
+            /etc/nixos/hardware-configuration.nix
+        ];
+
+        boot = {
+            extraModprobeConfig = ''
+            options snd slots=snd-hda-intel
+            '';
+            loader.grub = {
+                enable = true;
+                version = 2;
+                #device = "/dev/sda1";
+                device = "nodev";
+                memtest86.enable = false;
+            };
+        };
+
+        networking = {
+            hostName = "ippon-nixos";
+            wireless.enable = true;
+        };
+
+        swapDevices = [
+            {
+                label = "swap";
+            }
+        ];
+
+        services = {
+            <<services>>
+        };
+
+        users.defaultUserShell = "/run/current-system/sw/bin/zsh";
+        users.extraUsers.amitai = {
+            <<users>>
+        };
+
+        environment = {
+            systemPackages = with pkgs; [
+                <<basic>>
+                <<xmonad-apps>>
+                inkscape
+            ];
+
+            shellAliases = {
+                <<shell-aliases>>
+            };
+
+            interactiveShellInit = ''
+            <<interactive-shell-init>>
+            '';
+        };
+
+        fonts = {
+            enableFontDir = true;
+            enableGhostscriptFonts = true;
+            fonts = with pkgs; [
+                <<fonts>>
+            ];
+        };
+}
+#+end_src
+*** Lenovo Laptop
 :PROPERTIES:
 :ID:       29b02e0a-9aa8-4d5d-8d5a-43ac7b5c1735
 :END:
@@ -139,18 +283,7 @@
         ];
 
         services = {
-            acpid.enable = true;
-            upower.enable = true;
-            
-            xserver = {
-                enable = true;
-                #displayManager.kdm.enable = true;
-                #desktopManager.kde4.enable = true;
-                windowManager.xmonad.enable = true;
-                windowManager.default = "xmonad";
-                desktopManager.xterm.enable = false;
-                desktopManager.default = "none";
-            };
+            <<services>>
         };
 
         users.defaultUserShell = "/run/current-system/sw/bin/zsh";
@@ -165,26 +298,22 @@
 
         environment = {
             systemPackages = with pkgs; [
-                <<libraries>>
+                <<basic>>
+                <<xmonad-apps>>
                 <<games>>
                 <<command-line-tools>>
                 <<nix-tools>>
                 <<misc>>
-                <<media-players-viewers>>
                 <<media-editors>>
                 <<latex>>
                 <<interpreters>>
                 <<haskell>>
                 <<java>>
-                mplayer
                 <<ides>>
-                <<source-control>>
-                <<internet>>
                 <<math>>
                 <<system-tools>>
                 <<ruby-gems>>
-                #kde4.<<kde4>>
-                dmenu
+                mplayer
             ];
 
             shellAliases = {
@@ -205,129 +334,15 @@
         };
 }
 #+end_src
-
-** Asus eee
-:PROPERTIES:
-:ID:       0c800508-a040-431f-87f1-853cec936c1d
-:END:
-#+begin_src nix :noweb yes :tangle asus-eee-configuration.nix
-{ config, pkgs, ... }:
-
-{
-    nixpkgs.config.allowUnfree = true;
-    nixpkgs.config.allowBroken = true;
-    nixpkgs.config.allowTexliveBuilds = true;
-    nixpkgs.system = "x86_64-linux";
-    programs.zsh.enable = true;
-
-    imports =
-        [ # Include the results of the hardware scan.
-            /etc/nixos/hardware-configuration.nix
-        ];
-
-
-        boot.loader.grub.enable = true;
-        boot.loader.grub.version = 2;
-        # Define on which hard drive you want to install Grub.
-        boot.loader.grub.device = "/dev/sda";
-
-        networking = {
-            hostName = "asus-eee-nixos";
-            hostId = "6f8f7d5f";
-            interfaceMonitor.enable = false;
-            wireless.enable = false;
-            networkmanager.enable = true;
-            networkmanager.packages = [ pkgs.networkmanagerapplet ];
-            #useDHCP = false;
-            #wicd.enable = true;
-        };
-
-        # Select internationalisation properties.
-        # i18n = {
-        #   consoleFont = "lat9w-16";
-        #   consoleKeyMap = "us";
-        #   defaultLocale = "en_US.UTF-8";
-        # };
-
-        environment = {
-            systemPackages = with pkgs; [
-                emacs
-                dropbox-cli
-                x11vnc
-                <<haskell>>
-                <<source-control>>
-                <<latex>>
-                vlc
-                kde4.kmymoney
-                keepassx
-                aria
-                youtube-dl
-                midori
-                xfce.<<xfce>>
-            ];
-
-            shellAliases = {
-                <<shell-aliases>>
-            };
-
-            interactiveShellInit = ''
-            <<interactive-shell-init>>
-            '';
-        };
-
-        services = {
-            acpid.enable = true;
-            upower.enable = true;
-            
-            xserver = {
-                enable = true;
-                #displayManager.kdm.enable = true;
-                #desktopManager.kde4.enable = true;
-                windowManager.xmonad.enable = true;
-                windowManager.default = "xmonad";
-                desktopManager.xterm.enable = false;
-                desktopManager.default = "none";
-            };
-        };
-
-        users.defaultUserShell = "/run/current-system/sw/bin/zsh";
-        users.extraUsers.amitai = {
-            <<users>>
-        };
-
-        powerManagement = {
-            enable = true;
-            cpuFreqGovernor = "ondemand";
-        };
-
-}
-#+end_src
 ** Nix package manager
 *** Ubuntu
-**** General
-#+name: ubuntu
-#+begin_src nix
-<<source-control>>
-emacs
-kde4.kmymoney
-aria
-youtube-dl
-chromium
-vlc
-keepassx
-gparted
-pandoc
-xsel
-#easytag # Currently has a bug saving unicode
-python34Packages.mutagen
-#+end_src
 **** Lenovo
 :PROPERTIES:
 :ID:       22d8e589-c901-47f7-8c31-1d66bdd58305
 :END:
 #+begin_src nix :noweb yes :tangle lenovo-pkgs.nix
 with import <nixpkgs> {}; [ 
-    <<ubuntu>>
+    <<basic>>
 ]
 #+end_src
 **** Toshiba
@@ -336,9 +351,9 @@ with import <nixpkgs> {}; [
 :END:
 #+begin_src nix :noweb yes :tangle toshiba-pkgs.nix
 with import <nixpkgs> {}; [ 
+    <<basic>>
     <<haskell>>
     <<latex>>
-    <<ubuntu>>
 ]
 #+end_src
 **** Ippon
@@ -347,7 +362,7 @@ with import <nixpkgs> {}; [
 :END:
 #+begin_src nix :noweb yes :tangle ippon-pkgs.nix
 with import <nixpkgs> {}; [ 
-    <<ubuntu>>
+    <<basic>>
 ]
 #+end_src
 **** Asus
@@ -356,7 +371,9 @@ with import <nixpkgs> {}; [
 :END:
 #+begin_src nix :noweb yes :tangle asus-pkgs.nix
 with import <nixpkgs> {}; [ 
-    <<ubuntu>>
+    <<basic>>
+    #easytag # Currently has a bug saving unicode
+    python34Packages.mutagen
 ]
 #+end_src
 *** Mini-Mac
@@ -367,261 +384,12 @@ with import <nixpkgs> {}; [
 with import <nixpkgs> {}; [ 
     #dropbox
     #synergy
-    #emacs
     keepassx
     unison
 ]
 #+end_src
-** Packages
-:PROPERTIES:
-:ID:       1412ee13-ec78-44a0-8fba-a73e2e4254a8
-:END:
-*** Command line tools
-:PROPERTIES:
-:ID:       6d4cb55a-9ca1-48bb-bfa1-a3205ca18f74
-:END:
-
-#+name: command-line-tools
-#+begin_src nix
-bc
-zip
-unzip
-binutils
-#unoconv
-#+end_src
-*** Development
-**** Interperters
-:PROPERTIES:
-:ID:       faedc95b-2217-4ed3-b57f-2883be76039b
-:END:
-
-#+name: interpreters
-#+begin_src nix
-python
-#expect
-#tcl
-#+end_src
-**** Haskell
-:PROPERTIES:
-:ID:       740595ff-da44-41c5-88fb-728d45e5405f
-:END:
-
-#+name: haskell
-#+begin_src nix
-(haskellngPackages.ghcWithPackages
- (self : with self;
-  [ pipes
-    hint
-    cabal-install
-    diagrams diagrams-cairo diagrams-builder
-    shelly
-    random
-    HaskellForMaths
-    matrix
-    aeson-pretty
-    # htoml # not working meanwhile
-    HaTeX
-    # yi
-    xmobar
-    xmonad
-    xmonad-contrib
-    xmonad-extras
-  ] ))
-#+end_src
-**** Java
-:PROPERTIES:
-:ID:       799576a9-527e-44d7-8e4f-e25446a4c414
-:END:
-
-#+name: java
-#+begin_src nix
-#oraclejdk8
-#+end_src
-**** Editors and IDEs
-:PROPERTIES:
-:ID:       5419fb15-5f0c-42d7-a54b-59df0ccf5883
-:END:
-
-#+name: ides
-#+begin_src nix
-emacs
-#idea.android-studio
-#atom
-#+end_src
-**** Source Control
-:PROPERTIES:
-:ID:       8bef2816-a5ef-4cd1-bed2-bd27c4b419f3
-:END:
-
-#+name: source-control
-#+begin_src nix
-git
-git-annex
-meld
-#+end_src
-*** Games
-:PROPERTIES:
-:ID:       0305e0e0-298e-41cf-913a-88184364cd4b
-:END:
-
-#+name: games
-#+begin_src nix
-#rili
-#kde4.ktuberling
-# kde4.klines
-# kde4.pairs
-# asc
-# bullet
-#+end_src
-*** Internet
-:PROPERTIES:
-:ID:       e81a02c1-0762-4e1b-8067-7ca718344885
-:END:
-
-#+name: internet
-#+begin_src nix
-networkmanager
-chromium
-dropbox-cli
-aria
-youtube-dl
-telegram-cli
-#unison
-#+end_src
-*** KDE 4
-#+name: kde4
-#+begin_src nix
-kmix
-networkmanagement
-#+end_src
-*** Latex
-:PROPERTIES:
-:ID:       d41b3e36-9c2f-48ef-9b73-b9de3e4a4625
-:END:
-
-#+name: latex
-#+begin_src nix
-(texLiveAggregationFun { paths = [ texLive texLiveExtra texLiveBeamer ]; })
-#+end_src
-*** Libraries
-
-#+name: libraries
-#+begin_src nix
-#kde4.kdelibs
-#+end_src
-*** Math
-:PROPERTIES:
-:ID:       7858ac8d-1d4d-4f39-ae7d-4bb2d66d0b04
-:END:
-
-#+name: math
-#+begin_src nix
-octave
-#maxima
-#+end_src
-*** Media
-**** Players and Viewers
-:PROPERTIES:
-:ID:       1f0e2380-ebfa-4e18-ae4b-4c3fbe5651c2
-:END:
-
-#+name: media-players-viewers
-#+begin_src nix
-vlc
-kde4.gwenview
-evince
-#+end_src
-**** Editors
-:PROPERTIES:
-:ID:       30913cba-cd57-4fba-a2c2-cbd56bf40413
-:END:
-
-#+name: media-editors
-#+begin_src nix
-kde4.ksnapshot
-#darktable
-#gimp
-#xournal
-#kde4.kolourpaint
-#pinta
-#subtitleeditor
-#aegisub
-imagemagick
-#libreoffice
-#dia
-#+end_src
-*** Misc
-:PROPERTIES:
-:ID:       384d7586-b0f5-4a5e-93d4-5924db7d8e92
-:END:
-
-#+name: misc
-#+begin_src nix
-#commonsCompress
-#dvdisaster
-pandoc
-#synergy
-keepassx
-kde4.kmymoney
-#kde4.k3b
-#linuxPackages.virtualbox
-#+end_src
-*** Nix tools
-:PROPERTIES:
-:ID:       e27cd13d-be27-430e-a245-d8e9309dd329
-:END:
-
-#+name: nix-tools
-#+begin_src nix
-nox
-nix-prefetch-scripts
-nix-repl
-#+end_src
-*** Ruby Gems
-#+name: ruby-gems
-#+begin_src nix
-#ruby
-#bundix
-#taskjuggler
-#+end_src
-*** System Tools
-:PROPERTIES:
-:ID:       0dfede89-a46e-4a91-bf36-b4da96838561
-:END:
-
-#+name: system-tools
-#+begin_src nix
-unrar
-zsh
-kde4.filelight
-unetbootin
-gparted
-bluez
-blueman
-#+end_src
-*** XFCE
-#+name: xfce
-#+begin_src nix
-xfce4taskmanager
-#+end_src
-** Hardware 
-:PROPERTIES:
-:ID:       ffe178bc-3002-4027-99f7-0c2fb4145164
-:END:
-
-#+name: hardware
-#+begin_src nix
-bluetooth.enable = true;
-pulseaudio.enable = true;
-cpu.intel.updateMicrocode = true;
-opengl.s3tcSupport = true;
-
-bumblebee = {
-    enable = true;
-    group = "video";
-};
-#+end_src
-** Boot
+** Source blocks
+*** Boot
 :PROPERTIES:
 :ID:       42d050f5-cf82-48e0-bf93-ba85ea73c62a
 :END:
@@ -650,7 +418,7 @@ loader.grub = {
     memtest86.enable = false;
 };
 #+end_src
-** File Systems
+*** File Systems
 :PROPERTIES:
 :ID:       7090625a-05d9-46ae-9ee4-e5f12596bbe8
 :END:
@@ -673,12 +441,271 @@ loader.grub = {
     fsType = "ntfs";
 };
 #+end_src
-** Services
+*** Fonts
+:PROPERTIES:
+:ID:       738d5a2e-4d36-48a6-8a58-633a018ade65
+:END:
+
+#+name: fonts
+#+begin_src nix
+corefonts  # Micrsoft free fonts
+inconsolata  # monospaced
+ubuntu_font_family  # Ubuntu fonts
+cm_unicode
+#+end_src
+
+*** Hardware 
+:PROPERTIES:
+:ID:       ffe178bc-3002-4027-99f7-0c2fb4145164
+:END:
+
+#+name: hardware
+#+begin_src nix
+bluetooth.enable = true;
+pulseaudio.enable = true;
+cpu.intel.updateMicrocode = true;
+opengl.s3tcSupport = true;
+
+bumblebee = {
+    enable = true;
+    group = "video";
+};
+#+end_src
+*** Packages
+:PROPERTIES:
+:ID:       1412ee13-ec78-44a0-8fba-a73e2e4254a8
+:END:
+**** Basic
+:PROPERTIES:
+:ID:       8bef2816-a5ef-4cd1-bed2-bd27c4b419f3
+:END:
+
+#+name: basic
+#+begin_src nix
+chromium
+dropbox-cli
+emacs
+keepassx
+kde4.kmymoney
+git
+gitAndTools.git-annex
+gnupg
+meld
+aria
+youtube-dl
+telegram-cli
+pandoc
+gparted
+kde4.filelight
+unetbootin
+xsel
+xclip
+unrar
+zip
+unzip
+evince
+#+end_src
+**** Command line tools
+:PROPERTIES:
+:ID:       6d4cb55a-9ca1-48bb-bfa1-a3205ca18f74
+:END:
+
+#+name: command-line-tools
+#+begin_src nix
+bc
+binutils
+#unoconv
+#+end_src
+**** Development
+***** Interperters
+:PROPERTIES:
+:ID:       faedc95b-2217-4ed3-b57f-2883be76039b
+:END:
+
+#+name: interpreters
+#+begin_src nix
+python
+#expect
+#tcl
+#+end_src
+***** Haskell
+:PROPERTIES:
+:ID:       740595ff-da44-41c5-88fb-728d45e5405f
+:END:
+
+#+name: haskell
+#+begin_src nix
+(haskellngPackages.ghcWithPackages
+ (self : with self;
+  [ pipes
+    hint
+    cabal-install
+    diagrams diagrams-cairo diagrams-builder
+    shelly
+    random
+    HaskellForMaths
+    matrix
+    aeson-pretty
+    # htoml # not working meanwhile
+    HaTeX
+    # yi
+    xmobar
+    xmonad
+    xmonad-contrib
+    xmonad-extras
+  ] ))
+#+end_src
+***** Java
+:PROPERTIES:
+:ID:       799576a9-527e-44d7-8e4f-e25446a4c414
+:END:
+
+#+name: java
+#+begin_src nix
+#oraclejdk8
+#+end_src
+***** Editors and IDEs
+:PROPERTIES:
+:ID:       5419fb15-5f0c-42d7-a54b-59df0ccf5883
+:END:
+
+#+name: ides
+#+begin_src nix
+#idea.android-studio
+#atom
+#+end_src
+**** Games
+:PROPERTIES:
+:ID:       0305e0e0-298e-41cf-913a-88184364cd4b
+:END:
+
+#+name: games
+#+begin_src nix
+#rili
+#kde4.ktuberling
+# kde4.klines
+# kde4.pairs
+# asc
+# bullet
+#+end_src
+**** KDE 4
+#+name: kde4
+#+begin_src nix
+kmix
+networkmanagement
+gwenview
+ksnapshot
+#+end_src
+**** Latex
+:PROPERTIES:
+:ID:       d41b3e36-9c2f-48ef-9b73-b9de3e4a4625
+:END:
+
+#+name: latex
+#+begin_src nix
+(texLiveAggregationFun { paths = [ texLive texLiveExtra texLiveBeamer ]; })
+#+end_src
+**** Math
+:PROPERTIES:
+:ID:       7858ac8d-1d4d-4f39-ae7d-4bb2d66d0b04
+:END:
+
+#+name: math
+#+begin_src nix
+octave
+#maxima
+#+end_src
+**** Media
+***** Editors
+:PROPERTIES:
+:ID:       30913cba-cd57-4fba-a2c2-cbd56bf40413
+:END:
+
+#+name: media-editors
+#+begin_src nix
+#darktable
+#gimp
+#xournal
+#kde4.kolourpaint
+#pinta
+#subtitleeditor
+#aegisub
+imagemagick
+#libreoffice
+#dia
+#+end_src
+**** Misc
+:PROPERTIES:
+:ID:       384d7586-b0f5-4a5e-93d4-5924db7d8e92
+:END:
+
+#+name: misc
+#+begin_src nix
+#commonsCompress
+#dvdisaster
+#synergy
+#kde4.k3b
+#linuxPackages.virtualbox
+#+end_src
+**** Nix tools
+:PROPERTIES:
+:ID:       e27cd13d-be27-430e-a245-d8e9309dd329
+:END:
+
+#+name: nix-tools
+#+begin_src nix
+nox
+nix-prefetch-scripts
+nix-repl
+#+end_src
+**** Ruby Gems
+#+name: ruby-gems
+#+begin_src nix
+#ruby
+#bundix
+#taskjuggler
+#+end_src
+**** System Tools
+:PROPERTIES:
+:ID:       0dfede89-a46e-4a91-bf36-b4da96838561
+:END:
+
+#+name: system-tools
+#+begin_src nix
+#bluez
+#blueman
+#+end_src
+**** XFCE
+#+name: xfce
+#+begin_src nix
+xfce4taskmanager
+#+end_src
+**** Xmonad Apps
+#+name: xmonad-apps
+#+begin_src nix
+scrot
+gpicview
+dmenu
+#+end_src
+*** Services
+#+name: services
+#+begin_src nix
+acpid.enable = true;
+upower.enable = true;
+
+xserver = {
+    enable = true;
+    windowManager.xmonad.enable = true;
+    windowManager.default = "xmonad";
+    desktopManager.xterm.enable = false;
+    desktopManager.default = "none";
+};
+#+end_src
+*** Services (Old)
 :PROPERTIES:
 :ID:       e0899a47-aab2-46c7-b4a8-56827a4c9bc1
 :END:
 
-#+name: services
 #+begin_src nix    
 acpid.enable = true;
 upower.enable = true;
@@ -700,20 +727,7 @@ xserver = {
     desktopManager.kde4.enable = true;
 };
 #+end_src
-** Users
-:PROPERTIES:
-:ID:       b1c59348-47f5-42e5-abc3-d8bf1119fe6a
-:END:
-
-#+name: users
-#+begin_src nix
-isNormalUser = true;
-home = "/home/amitai";
-description = "Amitai Hoze";
-extraGroups = [ "wheel" "networkmanager" ];
-shell = "/run/current-system/sw/bin/zsh";
-#+end_src
-** Shell Aliases
+*** Shell Aliases
 :PROPERTIES:
 :ID:       f92cf89b-b0eb-476d-b0b1-baf7cb06e51e
 :END:
@@ -724,7 +738,7 @@ ls = "ls --color=tty";
 ll = "ls -l";
 l = "ls -alh";
 which = "type -P";
-switch = "sudo nixos-rebuild switch -I nixpkgs=/home/amitai/nixpkgs/";
+switch = "sudo nixos-rebuild switch -I nixpkgs=/home/amitai/github/nix/nixpkgs";
 gc = "nix-collect-garbage -d";
 list-installed = "nix-store -q --references /var/run/current-system/sw";
 gm = "ghc --make";
@@ -754,7 +768,7 @@ ydamp3 = "youtube-dl -x --audio-format mp3";
 ydp = "youtube-dl -i";
 bundix_here = "bundix --gemfile Gemfile --lockfile Gemfile.lock --target gemset.nix --lock";
 #+end_src
-** Shell init
+*** Shell init
 :PROPERTIES:
 :ID:       05ee2d6d-c724-410f-b4b0-4eddba20306d
 :END:
@@ -768,16 +782,16 @@ export doconSource=/home/amitai/src/docon/docon/source
 #export JAVA_HOME=dollar{pkgs.oraclejdk8.home}
 #export JAVA_HOME=dollar{pkgs.jdk.home}
 #+end_src
-** Fonts
+*** Users
 :PROPERTIES:
-:ID:       738d5a2e-4d36-48a6-8a58-633a018ade65
+:ID:       b1c59348-47f5-42e5-abc3-d8bf1119fe6a
 :END:
 
-#+name: fonts
+#+name: users
 #+begin_src nix
-corefonts  # Micrsoft free fonts
-inconsolata  # monospaced
-ubuntu_font_family  # Ubuntu fonts
-cm_unicode
+isNormalUser = true;
+home = "/home/amitai";
+description = "Amitai Hoze";
+extraGroups = [ "wheel" "networkmanager" ];
+shell = "/run/current-system/sw/bin/zsh";
 #+end_src
-
