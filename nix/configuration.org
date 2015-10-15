@@ -167,6 +167,83 @@
     };
 }
 #+end_src
+*** Basic Installation
+:PROPERTIES:
+:ID:       7f85168a-82ff-47da-9ecc-1939025e05d5
+:END:
+#+begin_src nix :noweb yes :tangle basic-configuration.nix
+{ pkgs, config, ... }: {
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowBroken = true;
+    nixpkgs.system = "x86_64-linux";
+    programs.zsh.enable = true;
+
+    imports =
+        [ # Include the results of the hardware scan.
+            /etc/nixos/hardware-configuration.nix
+        ];
+
+        boot = {
+            extraModprobeConfig = ''
+            options snd slots=snd-hda-intel
+            '';
+            loader.grub = {
+                enable = true;
+                version = 2;
+                #device = "/dev/sda1";
+                device = "nodev";
+                memtest86.enable = false;
+            };
+        };
+
+        networking = {
+            hostName = "basic-nixos";
+            wireless.enable = true;
+        };
+
+        swapDevices = [
+            {
+                label = "swap";
+            }
+        ];
+
+        services = {
+            <<services>>
+        };
+
+        users.defaultUserShell = "/run/current-system/sw/bin/zsh";
+        users.extraUsers.amitai = {
+            <<users>>
+        };
+
+        powerManagement = {
+            enable = true;
+            cpuFreqGovernor = "ondemand";
+        };
+
+        environment = {
+            systemPackages = with pkgs; [
+                <<basic>>
+            ];
+
+            shellAliases = {
+                <<shell-aliases>>
+            };
+
+            interactiveShellInit = ''
+            <<interactive-shell-init>>
+            '';
+        };
+
+        fonts = {
+            enableFontDir = true;
+            enableGhostscriptFonts = true;
+            fonts = with pkgs; [
+                <<fonts>>
+            ];
+        };
+}
+#+end_src
 *** Ippon Desktop
 :PROPERTIES:
 :ID:       29b02e0a-9aa8-4d5d-8d5a-43ac7b5c1735
@@ -482,6 +559,7 @@ bumblebee = {
 
 #+name: basic
 #+begin_src nix
+gnome3.nautilus
 chromium
 dropbox-cli
 emacs
