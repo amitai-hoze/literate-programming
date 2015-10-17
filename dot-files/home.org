@@ -2,14 +2,10 @@
 :PROPERTIES:
 :ID:       c7c5a66b-1de7-4ba1-98ac-c733f8c59976
 :END:
-** gitconfig
+** Bash Aliases
 :PROPERTIES:
-:ID:       6bcc54f4-e6c2-4a1e-b1ae-a83189d63e8d
+:ID:       97443da5-514c-4757-8477-65d2649fdfa4
 :END:
-#+begin_src conf :tangle .gitconfig
-[diff]
-external = ~/scripts/git-diff.sh
-[user]
-email = amitai.hoze@gmail.com
-name = Amitai Hoze
+#+begin_src sh :noweb yes :tangle .bash_aliases
+alias <<shell-aliases>>
 #+end_src
