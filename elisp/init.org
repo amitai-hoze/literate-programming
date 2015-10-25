@@ -232,8 +232,8 @@ Polymode [[id:11e4e284-733a-428c-bf60-2da04127568d][Jumps and closes all entries
 :END:
 #+begin_src emacs-lisp
 ;; The following lines are for getting org-mode from the development version
-;(setq load-path (cons "~/dropbox/dev/github/reps/org-mode/lisp" load-path))
-;(setq load-path (cons "~/dropbox/dev/github/reps/org-mode/contrib/lisp" load-path))
+(setq load-path (cons "~/github/elisp/org-mode/lisp" load-path))
+(setq load-path (cons "~/github/elisp/org-mode/contrib/lisp" load-path))
 
 (require 'org-install)
 #+end_src
