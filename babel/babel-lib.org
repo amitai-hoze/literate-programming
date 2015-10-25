@@ -203,38 +203,38 @@ done
 
 #+name: shell-aliases
 #+begin_src nix
-ls="ls --color=tty"
-ll="ls -l"
-l="ls -alh"
-which="type -P"
-switch="sudo nixos-rebuild switch -I nixpkgs=/home/amitai/nixpkgs/"
-gc="nix-collect-garbage -d"
-list-installed="nix-store -q --references /var/run/current-system/sw"
-gm="ghc --make"
-ne="nix-env -f ~/nixpkgs/"
-fpo="stat -c \"%a %n\""
-gs="git status"
-gd="git diff"
-gdxd="git diff --diff-filter=M"
-orgmode-update="git pull && make clean && make && make doc"
-odt2org="python ~/applications/odt2org/odt2org.py"
-og="open_gemara.sh"
-n_h="nautilus ."
-e="emacs"
-pjsua="/home/amitai/src/pjproject-2.3/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu"
+ls="ls --color=tty";
+ll="ls -l";
+l="ls -alh";
+which="type -P";
+switch="sudo nixos-rebuild switch -I nixpkgs=/home/amitai/nixpkgs/";
+gc="nix-collect-garbage -d";
+list-installed="nix-store -q --references /var/run/current-system/sw";
+gm="ghc --make";
+ne="nix-env -f ~/nixpkgs/";
+fpo="stat -c \"%a %n\"";
+gs="git status";
+gd="git diff";
+gdxd="git diff --diff-filter=M";
+orgmode-update="git pull && make clean && make && make doc";
+odt2org="python ~/applications/odt2org/odt2org.py";
+og="open_gemara.sh";
+n_h="nautilus .";
+e="emacs";
+pjsua="/home/amitai/src/pjproject-2.3/pjsip-apps/bin/pjsua-x86_64-unknown-linux-gnu";
 # Security measurements, see [[id:8d28664c-8660-49ae-88ea-eec585ace26e][Protecting files from deletion]]
-cp="cp -i"
-mv="mv -i"
-rm="rm -i"
-rc="~/scripts/mac/remote_command.sh"
-ssh_h="~/scripts/mac/ssh_here.sh"
-cb="carthage build --platform iOS --verbose"
-cu="carthage update --platform iOS --verbose"
-crontab_log="grep CRON /var/log/syslog"
-tgz="tar -zxvf"
-gsct="git show -s --format=%ci"
-ydamp3="youtube-dl -x --audio-format mp3"
-ydp="youtube-dl -i"
-bundix_here="bundix --gemfile Gemfile --lockfile Gemfile.lock --target gemset.nix --lock"
+cp="cp -i";
+mv="mv -i";
+rm="rm -i";
+rc="~/scripts/mac/remote_command.sh";
+ssh_h="~/scripts/mac/ssh_here.sh";
+cb="carthage build --platform iOS --verbose";
+cu="carthage update --platform iOS --verbose";
+crontab_log="grep CRON /var/log/syslog";
+tgz="tar -zxvf";
+gsct="git show -s --format=%ci";
+ydamp3="youtube-dl -x --audio-format mp3";
+ydp="youtube-dl -i";
+bundix_here="bundix --gemfile Gemfile --lockfile Gemfile.lock --target gemset.nix --lock";
 #+end_src
 
