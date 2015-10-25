@@ -207,7 +207,7 @@ ls="ls --color=tty";
 ll="ls -l";
 l="ls -alh";
 which="type -P";
-switch="sudo nixos-rebuild switch -I nixpkgs=/home/amitai/nixpkgs/";
+switch="sudo nixos-rebuild switch -I nixpkgs=/home/amitai/github/nix/nixpkgs";
 gc="nix-collect-garbage -d";
 list-installed="nix-store -q --references /var/run/current-system/sw";
 gm="ghc --make";
