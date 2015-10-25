@@ -15,6 +15,9 @@
 :ID:       ef70512c-f090-4121-a161-090dcdf96fcb
 :END:
 #+begin_src emacs-lisp
+;; The following lines are for getting org-mode from the development version
+(setq load-path (cons "~/github/elisp/org-mode/lisp" load-path))
+(setq load-path (cons "~/github/elisp/org-mode/contrib/lisp" load-path))
 ;; Adding per file elisp settings
 (add-to-list 'load-path "~/org-mode/elisp")
 (add-to-list 'load-path "~/lib/elisp")
@@ -131,7 +134,6 @@ For now make it for everything:
 :ID:       68d5c7a4-5314-41b9-ab66-bb65791aa35e
 :END:
 #+begin_src emacs-lisp
-(add-to-list 'load-path "~/reps/visual-basic-mode")
 (require 'visual-basic-mode)
 #+end_src
 *** vbscript mode
@@ -139,7 +141,6 @@ For now make it for everything:
 :ID:       b974ed06-64b8-41e6-af5f-8764fbbcea15
 :END:
 #+begin_src emacs-lisp
-(add-to-list 'load-path "~/reps/vbs-repl")
 (require 'vbs-repl)
 
 ; VBScript editing
@@ -231,10 +232,6 @@ Polymode [[id:11e4e284-733a-428c-bf60-2da04127568d][Jumps and closes all entries
 :ID:       ed1ccf34-76b4-4906-a19c-1101cb489961
 :END:
 #+begin_src emacs-lisp
-;; The following lines are for getting org-mode from the development version
-(setq load-path (cons "~/github/elisp/org-mode/lisp" load-path))
-(setq load-path (cons "~/github/elisp/org-mode/contrib/lisp" load-path))
-
 (require 'org-install)
 #+end_src
 *** Images
