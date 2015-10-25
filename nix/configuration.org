@@ -411,6 +411,84 @@
         };
 }
 #+end_src
+*** IBM ThinkPad
+:PROPERTIES:
+:ID:       2eb4e603-f93b-44b2-bb7b-e0e974c9eb1d
+:END:
+#+begin_src nix :noweb yes :tangle ibm-configuration.nix
+{ pkgs, config, ... }: {
+    nixpkgs.config.allowUnfree = true;
+    nixpkgs.config.allowBroken = true;
+    nixpkgs.system = "i686-linux";
+    programs.zsh.enable = true;
+
+    imports =
+        [ # Include the results of the hardware scan.
+            /etc/nixos/hardware-configuration.nix
+        ];
+
+        boot = {
+            extraModprobeConfig = ''
+            options snd slots=snd-hda-intel
+            '';
+            loader.grub = {
+                enable = true;
+                version = 2;
+                device = "dev/sda";
+                memtest86.enable = false;
+            };
+        };
+
+        networking = {
+            hostName = "ibm-thinkpad-nixos";
+            wireless.enable = true;
+        };
+
+        swapDevices = [
+            {
+                label = "swap";
+            }
+        ];
+
+        services = {
+            <<services>>
+        };
+
+        users.defaultUserShell = "/run/current-system/sw/bin/zsh";
+        users.extraUsers.amitai = {
+            <<users>>
+        };
+
+        powerManagement = {
+            enable = true;
+            cpuFreqGovernor = "ondemand";
+        };
+
+        environment = {
+            systemPackages = with pkgs; [
+                <<basic>>
+                <<xmonad-apps>>
+                <<games>>
+            ];
+
+            shellAliases = {
+                <<shell-aliases>>
+            };
+
+            interactiveShellInit = ''
+            <<interactive-shell-init>>
+            '';
+        };
+
+        fonts = {
+            enableFontDir = true;
+            enableGhostscriptFonts = true;
+            fonts = with pkgs; [
+                <<fonts>>
+            ];
+        };
+}
+#+end_src
 ** Nix package manager
 *** Ubuntu
 **** Lenovo
