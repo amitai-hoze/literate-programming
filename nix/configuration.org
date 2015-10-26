@@ -107,7 +107,17 @@
     };
 
     fileSystems = {
-        <<file-systems>>
+        <<root>>
+
+        "/home/amitai/data1" = {
+            device = "/dev/disk/by-label/Data1";
+            fsType = "ntfs";
+        };
+
+        "/home/amitai/data2" = {
+            device = "/dev/disk/by-label/Data2";
+            fsType = "ntfs";
+        };
     };
 
     swapDevices = [
@@ -434,7 +444,7 @@
             loader.grub = {
                 enable = true;
                 version = 2;
-                device = "dev/sda";
+                device = "/dev/sda";
                 memtest86.enable = false;
             };
         };
@@ -442,6 +452,10 @@
         networking = {
             hostName = "ibm-thinkpad-nixos";
             wireless.enable = true;
+        };
+
+        fileSystems = {
+            <<root>>
         };
 
         swapDevices = [
@@ -578,22 +592,12 @@ loader.grub = {
 :ID:       7090625a-05d9-46ae-9ee4-e5f12596bbe8
 :END:
 
-#+name: file-systems
+#+name: root
 #+begin_src nix
 "/" = {
     device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
     options = "defaults,noatime,discard";
-};
-    
-"/home/amitai/data1" = {
-    device = "/dev/disk/by-label/Data1";
-    fsType = "ntfs";
-};
-
-"/home/amitai/data2" = {
-    device = "/dev/disk/by-label/Data2";
-    fsType = "ntfs";
 };
 #+end_src
 *** Fonts
