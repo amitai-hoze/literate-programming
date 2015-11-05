@@ -689,13 +689,13 @@ This is in order to compile a Haskell code block tangled file, and create a diag
 	     )
 	(call-process-shell-command (concat "rm " executable))
 	(message (shell-command-to-string (concat "ghc --make " file-name)))
-	(when (string-match "Diagram B R2" (buffer-string))
+	(when (string-match "Diagram B" (buffer-string))
 	  (while (not (file-exists-p executable)))
 	  (call-process-shell-command (concat "rm " image-file-name))
 	  (while (< 0 (length (shell-command-to-string (concat path "/" executable " -o " image-file-name " -h 400 -w 1500")))))
 	  )))))
 
-;(add-hook 'org-babel-post-tangle-hook 'compile-haskell)
+(add-hook 'org-babel-post-tangle-hook 'compile-haskell)
 #+end_src
 
 This is a key binding to perform the tangle of a haskell block and display the image
