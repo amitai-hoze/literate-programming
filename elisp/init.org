@@ -1294,6 +1294,23 @@ Meanwhile not working
 (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
 (add-hook 'swift-mode-hook 'outline-minor-mode)
 #+end_src
+** Google Translate
+:PROPERTIES:
+:ID:       239dabe3-fe1f-498c-93e7-739b8ebdce1a
+:END:
+#+begin_src emacs-lisp
+(require 'google-translate)
+(require 'google-translate-default-ui)
+
+(setq google-translate-default-source-language "iw")
+(setq google-translate-default-target-language "en")
+
+(defun translate-hebrew (text)
+  (let* ((translation-newline (google-translate-translate "iw" "en" text 'echo-area))
+         (translation-raw (replace-regexp-in-string "\n" " " translation-newline)))
+    (save-match-data
+      (replace-regexp-in-string "Hebrew -> English: .*? - " "" translation-raw))))
+#+end_src
 ** Latex
 :PROPERTIES:
 :ID:       ecb1a6f8-5870-42b1-8a62-89ce7a4d274f
