@@ -1,9 +1,3 @@
-#+LATEX_HEADER: \usepackage{parskip}
-#+LATEX_HEADER: \usepackage{inconsolata}
-
-#+TITLE:NixOS configuration file
-#+AUTHOR:Amitai Hoze
-
 * NixOS configuration file
 :PROPERTIES:
 :ID:       75ac1874-d700-4e66-9058-fa8753cf3e7c

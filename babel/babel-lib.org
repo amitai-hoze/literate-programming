@@ -1,8 +1,3 @@
-#+name: clear-table-errors
-#+begin_src emacs-lisp :results silent
-(replace-regexp "#ERROR" "")
-(org-ctrl-c-ctrl-c)
-#+end_src
 * Examples
 ** Tables
 #+name: fib-s-1
@@ -158,6 +153,12 @@ programmode: false;
                       (to-tab (cddr table)))
             (to-tab table))))))
 #+end_src
+** Clear table errors
+#+name: clear-table-errors
+#+begin_src emacs-lisp :results silent
+(replace-regexp "#ERROR" "")
+(org-ctrl-c-ctrl-c)
+#+end_src
 * Latex
 ** Matrices
 #+name: pmatrix-math-constant-spacing
@@ -213,6 +214,7 @@ list-installed="nix-store -q --references /var/run/current-system/sw";
 gm="ghc --make";
 ne="nix-env -f ~/nixpkgs/";
 fpo="stat -c \"%a %n\"";
+ga="git add";
 gs="git status";
 gd="git diff";
 gp="git pull";
@@ -238,5 +240,9 @@ gsct="git show -s --format=%ci";
 ydamp3="youtube-dl -x --audio-format mp3";
 ydp="youtube-dl -i";
 bundix_here="bundix --gemfile Gemfile --lockfile Gemfile.lock --target gemset.nix --lock";
+cf="xclip -sel clip <";
+ds="dropbox status";
+dstart="dropbox start";
+dstop="dropbox stop";
 #+end_src
 

@@ -1359,7 +1359,8 @@ Meanwhile not working
 
 ;; Fix BibTex bug
 ;(setq org-latex-pdf-process (quote ("PATH=\"/home/amitai/.cabal/bin\":$PATH PDFLATEX=\"pdflatex --shell-escape\" texi2dvi -p -b -V %f")))
-(setq org-latex-pdf-process (quote ("texi2dvi -p -b -V %f")))
+(setq org-latex-pdf-process (quote ("texi2dvi -p -b -V --build-dir %o -o %o%b.pdf %f")))
+;; (setq org-latex-pdf-process (quote ("pdflatex --shell-escape -output-directory %o %f")))
 
 ;; AUCTeX
 ;; Compile documents to PDF by default
