@@ -826,7 +826,7 @@ This is a key binding to perform the tangle of a haskell block and display the i
 		   (org-make-org-heading-search-string
 		    (buffer-substring (point-at-bol) (point-at-eol)))))))))
 #+end_src
-*** org-id
+*** COMMENT org-id
 :PROPERTIES:
 :ID:       bdb88f58-6f45-464d-b14b-24ab8e9c5430
 :END:
@@ -1294,7 +1294,7 @@ Meanwhile not working
 (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
 (add-hook 'swift-mode-hook 'outline-minor-mode)
 #+end_src
-** Google Translate
+** COMMENT Google Translate
 :PROPERTIES:
 :ID:       239dabe3-fe1f-498c-93e7-739b8ebdce1a
 :END:
