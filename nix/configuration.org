@@ -707,6 +707,8 @@ python
     xmonad
     # xmonad-contrib
     # xmonad-extras
+    # besout
+    polynomial
   ] ))
 #+end_src
 ***** Java
@@ -767,7 +769,7 @@ ksnapshot
 #+name: math
 #+begin_src nix
 octave
-#maxima
+maxima
 #+end_src
 **** Media
 ***** Editors
